@@ -9,7 +9,7 @@ var (
 )
 
 func init() {
-	conn, err := redis.Dial("tcp", ":6370")
+	conn, err := redis.Dial("tcp", Config.RedisAddr)
 	if err != nil {
 		panic(err)
 	}

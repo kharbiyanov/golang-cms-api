@@ -1,11 +1,11 @@
 package auth
 
 import (
+	"cms-api/errors"
 	"cms-api/utils"
-	"errors"
+	"encoding/json"
 	"github.com/graphql-go/graphql"
 	uuid "github.com/satori/go.uuid"
-	"net/http"
 )
 
 type User struct {
@@ -68,14 +68,16 @@ var queryType = graphql.NewObject(
 
 					if usernameOK && passwordOK && rememberOK {
 						if username != "kharbiyanov" {
-							return user, utils.GQError{
-								Err:  errors.New("invalid login"),
-								Code: 13,
+							return user, &errors.ErrorWithCode{
+								Message: errors.StatusUnauthorizedText,
+								Code:    errors.StatusUnauthorized,
 							}
-							//return user, gqlerrors.
 						}
 						if password != "123321" {
-							return user, errors.New("wrong password")
+							return user, &errors.ErrorWithCode{
+								Message: errors.StatusWrongPasswordText,
+								Code:    errors.StatusUnauthorized,
+							}
 						}
 
 						user.ID = 7
@@ -84,9 +86,19 @@ var queryType = graphql.NewObject(
 						user.LastName = "Kharbiyanov"
 						user.Token = sessionToken
 
-						_, err := utils.Redis.Do("SETEX", sessionToken, "120", user)
+						jsonUser, err := json.Marshal(user)
 						if err != nil {
-							return "", errors.New(http.StatusText(http.StatusInternalServerError))
+							return user, &errors.ErrorWithCode{
+								Message: errors.StatusInternalServerErrorText,
+								Code:    errors.StatusInternalServerError,
+							}
+						}
+
+						if _, err := utils.Redis.Do("SETEX", sessionToken, "120", jsonUser); err != nil {
+							return user, &errors.ErrorWithCode{
+								Message: errors.StatusInternalServerErrorText,
+								Code:    errors.StatusInternalServerError,
+							}
 						}
 					}
 					return user, nil
@@ -100,7 +112,10 @@ var queryType = graphql.NewObject(
 					token := params.Context.Value("authToken")
 					_, err := utils.Redis.Do("DEL", token)
 					if err != nil {
-						return "", errors.New(http.StatusText(http.StatusInternalServerError))
+						return user, &errors.ErrorWithCode{
+							Message: errors.StatusInternalServerErrorText,
+							Code:    errors.StatusInternalServerError,
+						}
 					}
 
 					return nil, nil
