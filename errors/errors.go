@@ -3,6 +3,7 @@ package errors
 const (
 	ForbiddenCode           = "FORBIDDEN"
 	InternalServerErrorCode = "INTERNAL_SERVER_ERROR"
+	PostCreationErrorCode   = "POST_CREATION_ERROR"
 )
 
 const (
@@ -11,6 +12,7 @@ const (
 	InvalidTokenErrorCodeMessage = "Invalid Token"
 	InvalidLoginErrorMessage     = "Invalid Login"
 	WrongPasswordErrorMessage    = "Wrong Password"
+	PostSlugExistMessage         = "Post Slug Exist"
 )
 
 type ErrorWithCode struct {

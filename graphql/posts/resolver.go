@@ -1,6 +1,7 @@
 package posts
 
 import (
+	"cms-api/errors"
 	"cms-api/utils"
 	"fmt"
 	"github.com/graphql-go/graphql"
@@ -23,16 +24,16 @@ func GetPosts(params graphql.ResolveParams, postConfig PostConfig) (interface{},
 	offset, offsetExist := params.Args["offset"].(int)
 
 	var posts []Post
-	query := utils.DB.Where(&Post{Type: fmt.Sprintf("%s", postConfig.Slug)})
+	tx := utils.DB.Where(&Post{Type: fmt.Sprintf("%s", postConfig.Slug)})
 	if firstExist {
-		query = query.Limit(first)
+		tx = tx.Limit(first)
 	} else {
-		query = query.Limit(utils.Config.DefaultPostsLimit)
+		tx = tx.Limit(utils.Config.DefaultPostsLimit)
 	}
 	if offsetExist {
-		query = query.Offset(offset)
+		tx = tx.Offset(offset)
 	}
-	if err := query.Find(&posts).Error; err != nil {
+	if err := tx.Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil
@@ -47,6 +48,14 @@ func CreatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{
 		Slug:    params.Args["slug"].(string),
 		Type:    postConfig.Slug,
 	}
+
+	if ! utils.DB.Where("slug = ?", post.Slug).First(&post).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.PostSlugExistMessage,
+			Code:    errors.PostCreationErrorCode,
+		}
+	}
+
 	if err := utils.DB.Create(post).Scan(post).Error; err != nil {
 		return nil, err
 	}
@@ -56,14 +65,14 @@ func CreatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{
 func GetMeta(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
 	keys, keysExist := params.Args["keys"].([]interface{})
 	post, postExist := params.Source.(Post)
-	metaQuery := utils.DB
+	tx := utils.DB
 	if ! postExist {
 		return nil, nil
 	}
 	if keysExist {
-		metaQuery = metaQuery.Where("key in(?)", keys)
+		tx = tx.Where("key in(?)", keys)
 	}
-	if err := metaQuery.Model(&post).Association("Meta").Find(&post.Meta).Error; err != nil {
+	if err := tx.Model(&post).Association("Meta").Find(&post.Meta).Error; err != nil {
 		return nil, err
 	}
 	return post.Meta, nil
