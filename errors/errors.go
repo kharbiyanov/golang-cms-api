@@ -1,14 +1,16 @@
 package errors
 
 const (
-	StatusUnauthorized        = "UNAUTHORIZED"
-	StatusInternalServerError = "INTERNAL_SERVER_ERROR"
+	ForbiddenCode           = "FORBIDDEN"
+	InternalServerErrorCode = "INTERNAL_SERVER_ERROR"
 )
 
 const (
-	StatusUnauthorizedText        = "Unauthorized"
-	StatusWrongPasswordText       = "Wrong Password"
-	StatusInternalServerErrorText = "Internal Server Error"
+	ForbiddenCodeMessage         = "Forbidden"
+	InternalServerErrorMessage   = "Internal Server Error"
+	InvalidTokenErrorCodeMessage = "Invalid Token"
+	InvalidLoginErrorMessage     = "Invalid Login"
+	WrongPasswordErrorMessage    = "Wrong Password"
 )
 
 type ErrorWithCode struct {

@@ -1,0 +1,13 @@
+{
+  "SERVER_ADDR": ":7001",
+  "REDIS_ADDR": ":6370",
+  "DEBUG": true,
+  "DB": {
+    "HOST": "localhost",
+    "PORT": "5501",
+    "SSL_MODE": "disable",
+    "NAME": "postgres",
+    "USER": "postgres",
+    "PASS": "123321"
+  }
+}
