@@ -7,8 +7,8 @@ import (
 )
 
 func GetPost(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
-	id, idOK := params.Args["id"].(int)
-	if ! idOK {
+	id, idExist := params.Args["id"].(int)
+	if ! idExist {
 		return nil, nil
 	}
 	var post Post
@@ -19,8 +19,20 @@ func GetPost(params graphql.ResolveParams, postConfig PostConfig) (interface{}, 
 }
 
 func GetPosts(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
+	first, firstExist := params.Args["first"].(int)
+	offset, offsetExist := params.Args["offset"].(int)
+
 	var posts []Post
-	if err := utils.DB.Where(&Post{Type: fmt.Sprintf("%s", postConfig.Slug)}).Find(&posts).Error; err != nil {
+	query := utils.DB.Where(&Post{Type: fmt.Sprintf("%s", postConfig.Slug)})
+	if firstExist {
+		query = query.Limit(first)
+	} else {
+		query = query.Limit(utils.Config.DefaultPostsLimit)
+	}
+	if offsetExist {
+		query = query.Offset(offset)
+	}
+	if err := query.Find(&posts).Error; err != nil {
 		return nil, err
 	}
 	return posts, nil
@@ -42,13 +54,13 @@ func CreatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{
 }
 
 func GetMeta(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
-	keys, keysOK := params.Args["keys"].([]interface{})
-	post, postOK := params.Source.(Post)
+	keys, keysExist := params.Args["keys"].([]interface{})
+	post, postExist := params.Source.(Post)
 	metaQuery := utils.DB
-	if ! postOK {
+	if ! postExist {
 		return nil, nil
 	}
-	if keysOK {
+	if keysExist {
 		metaQuery = metaQuery.Where("key in(?)", keys)
 	}
 	if err := metaQuery.Model(&post).Association("Meta").Find(&post.Meta).Error; err != nil {

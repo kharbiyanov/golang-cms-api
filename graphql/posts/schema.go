@@ -35,6 +35,14 @@ func GetQuery(postType *graphql.Object, postConfig PostConfig) graphql.Fields {
 	fields[postList] = &graphql.Field{
 		Type:        graphql.NewList(postType),
 		Description: fmt.Sprintf("Get %s list", postConfig.Slug),
+		Args: graphql.FieldConfigArgument{
+			"first": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"offset": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return GetPosts(params, postConfig)
 		},

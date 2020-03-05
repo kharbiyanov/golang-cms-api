@@ -7,11 +7,12 @@ import (
 )
 
 type config struct {
-	ServerAddr  *string `json:"SERVER_ADDR"`
-	RedisAddr   *string `json:"REDIS_ADDR"`
-	DB          db      `json:"DB"`
-	Debug       *bool   `json:"DEBUG"`
-	TokenHeader string  `json:"-"`
+	ServerAddr        *string `json:"SERVER_ADDR"`
+	RedisAddr         *string `json:"REDIS_ADDR"`
+	DB                db      `json:"DB"`
+	Debug             *bool   `json:"DEBUG"`
+	TokenHeader       string  `json:"-"`
+	DefaultPostsLimit int     `json:"-"`
 }
 
 type db struct {
@@ -24,7 +25,8 @@ type db struct {
 }
 
 var Config = &config{
-	TokenHeader: "Auth-Token",
+	TokenHeader:       "Auth-Token",
+	DefaultPostsLimit: 10,
 }
 
 func init() {
