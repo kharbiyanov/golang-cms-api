@@ -3,7 +3,6 @@ package posts
 import (
 	"cms-api/errors"
 	"cms-api/utils"
-	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
@@ -12,8 +11,11 @@ func GetPost(params graphql.ResolveParams, postConfig PostConfig) (interface{}, 
 	if ! idExist {
 		return nil, nil
 	}
-	var post Post
-	if err := utils.DB.Where(&Post{ID: id, Type: fmt.Sprintf("%s", postConfig.Slug)}).First(&post).Error; err != nil {
+
+	var post = Post{}
+	post.ID = id
+
+	if err := utils.DB.Where(&Post{Type: postConfig.Slug}).First(&post).Error; err != nil {
 		return nil, err
 	}
 	return post, nil
@@ -24,7 +26,8 @@ func GetPosts(params graphql.ResolveParams, postConfig PostConfig) (interface{},
 	offset, offsetExist := params.Args["offset"].(int)
 
 	var posts []Post
-	tx := utils.DB.Where(&Post{Type: fmt.Sprintf("%s", postConfig.Slug)})
+
+	tx := utils.DB.Where(&Post{Type: postConfig.Slug})
 	if firstExist {
 		tx = tx.Limit(first)
 	} else {
@@ -49,10 +52,10 @@ func CreatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{
 		Type:    postConfig.Slug,
 	}
 
-	if ! utils.DB.Where("slug = ?", post.Slug).First(&post).RecordNotFound() {
+	if ! utils.DB.Where(&Post{Slug: post.Slug, Type: postConfig.Slug}).First(&post).RecordNotFound() {
 		return nil, &errors.ErrorWithCode{
 			Message: errors.PostSlugExistMessage,
-			Code:    errors.PostCreationErrorCode,
+			Code:    errors.InvalidParamsCode,
 		}
 	}
 
@@ -62,13 +65,70 @@ func CreatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{
 	return post, nil
 }
 
+func UpdatePost(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	fields := make(map[string]interface{})
+
+	var post Post
+
+	if title, titleExist := params.Args["title"].(string); titleExist {
+		fields["title"] = title
+	}
+	if content, contentExist := params.Args["content"].(string); contentExist {
+		fields["content"] = content
+	}
+	if excerpt, excerptExist := params.Args["excerpt"].(string); excerptExist {
+		fields["excerpt"] = excerpt
+	}
+	if status, statusExist := params.Args["status"].(string); statusExist {
+		fields["status"] = status
+	}
+	if slug, slugExist := params.Args["slug"].(string); slugExist {
+		fields["slug"] = slug
+		if ! utils.DB.Where(&Post{Type: postConfig.Slug, Slug: slug}).Not(&Post{ID: id}).First(&post).RecordNotFound() {
+			return nil, &errors.ErrorWithCode{
+				Message: errors.PostSlugExistMessage,
+				Code:    errors.InvalidParamsCode,
+			}
+		}
+	}
+
+	post.ID = id
+
+	if err := utils.DB.Model(&post).Updates(fields).Scan(&post).Error; err != nil {
+		return nil, err
+	}
+	return post, nil
+}
+
+func DeletePost(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
+	id, idExist := params.Args["id"].(int)
+	if ! idExist {
+		return nil, nil
+	}
+
+	var post = Post{}
+	post.ID = id
+
+	if err := utils.DB.Delete(&post).Error; err != nil {
+		return nil, err
+	}
+	if err := utils.DB.Where(&PostMeta{PostID: id}).Delete(&PostMeta{}).Error; err != nil {
+		return nil, err
+	}
+	return nil, nil
+}
+
 func GetMeta(params graphql.ResolveParams, postConfig PostConfig) (interface{}, error) {
 	keys, keysExist := params.Args["keys"].([]interface{})
 	post, postExist := params.Source.(Post)
-	tx := utils.DB
+
 	if ! postExist {
 		return nil, nil
 	}
+
+	tx := utils.DB
+
 	if keysExist {
 		tx = tx.Where("key in(?)", keys)
 	}

@@ -94,20 +94,28 @@ func GetMutation(postType *graphql.Object, postConfig PostConfig) graphql.Fields
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
 			},
-			"name": &graphql.ArgumentConfig{
+			"title": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
-			"info": &graphql.ArgumentConfig{
+			"content": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
-			"price": &graphql.ArgumentConfig{
-				Type: graphql.Float,
+			"excerpt": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"status": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.String,
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			post := Post{}
+			if err := utils.ValidateUser(params, postConfig.PluralSlug, "update"); err != nil {
+				return nil, err
+			}
 
-			return post, nil
+			return UpdatePost(params, postConfig)
 		},
 	}
 
@@ -120,9 +128,11 @@ func GetMutation(postType *graphql.Object, postConfig PostConfig) graphql.Fields
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			post := Post{}
+			if err := utils.ValidateUser(params, postConfig.PluralSlug, "delete"); err != nil {
+				return nil, err
+			}
 
-			return post, nil
+			return DeletePost(params, postConfig)
 		},
 	}
 

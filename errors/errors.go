@@ -3,7 +3,7 @@ package errors
 const (
 	ForbiddenCode           = "FORBIDDEN"
 	InternalServerErrorCode = "INTERNAL_SERVER_ERROR"
-	PostCreationErrorCode   = "POST_CREATION_ERROR"
+	InvalidParamsCode       = "INVALID_PARAMS"
 )
 
 const (
