@@ -1,13 +1,12 @@
-package posts
+package models
 
 import (
-	"cms-api/utils"
 	"time"
 )
 
 type PostConfig struct {
-	Slug       string
-	PluralSlug string
+	Slug       string `json:"slug"`
+	PluralSlug string `json:"pluralSlug"`
 }
 
 type Post struct {
@@ -33,8 +32,4 @@ type PostMeta struct {
 	PostID    int
 	Key       string `gorm:"type:varchar(255)"`
 	Value     string
-}
-
-func init() {
-	utils.DB.AutoMigrate(&Post{}, &PostMeta{})
 }

@@ -1,19 +1,20 @@
 package posts
 
 import (
+	"cms-api/models"
 	"cms-api/utils"
 	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
-func GetSchemaConfig(postConfig PostConfig) (graphql.Fields, graphql.Fields) {
+func GetSchemaConfig(postConfig models.PostConfig) (graphql.Fields, graphql.Fields) {
 	postType := GetPostType(postConfig)
 	query := GetQuery(postType, postConfig)
 	mutation := GetMutation(postType, postConfig)
 	return query, mutation
 }
 
-func GetQuery(postType *graphql.Object, postConfig PostConfig) graphql.Fields {
+func GetQuery(postType *graphql.Object, postConfig models.PostConfig) graphql.Fields {
 	fields := graphql.Fields{}
 
 	postGet := postConfig.Slug + "Get"
@@ -51,7 +52,7 @@ func GetQuery(postType *graphql.Object, postConfig PostConfig) graphql.Fields {
 	return fields
 }
 
-func GetMutation(postType *graphql.Object, postConfig PostConfig) graphql.Fields {
+func GetMutation(postType *graphql.Object, postConfig models.PostConfig) graphql.Fields {
 	fields := graphql.Fields{}
 
 	postCreate := postConfig.Slug + "Create"

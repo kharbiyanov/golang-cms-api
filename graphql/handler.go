@@ -1,8 +1,8 @@
 package graphql
 
 import (
+	"cms-api/config"
 	"cms-api/graphql/posts"
-	"cms-api/utils"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
@@ -15,7 +15,7 @@ func GetHandler() gin.HandlerFunc {
 		h := handler.New(&handler.Config{
 			Schema:     getSchema(),
 			Pretty:     true,
-			Playground: *utils.Config.Debug,
+			Playground: config.Get().Debug,
 			RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
 				return map[string]interface{}{
 					"context": c,
@@ -26,23 +26,12 @@ func GetHandler() gin.HandlerFunc {
 	}
 }
 
-var postTypes = []posts.PostConfig{
-	{
-		Slug:       "page",
-		PluralSlug: "pages",
-	},
-	{
-		Slug:       "news",
-		PluralSlug: "news",
-	},
-}
-
 func getSchema() *graphql.Schema {
 
 	query := graphql.Fields{}
 	mutation := graphql.Fields{}
 
-	for _, postConfig := range postTypes {
+	for _, postConfig := range config.Get().PostTypes {
 		queryFields, mutationFields := posts.GetSchemaConfig(postConfig)
 		for key, val := range queryFields {
 			query[key] = val

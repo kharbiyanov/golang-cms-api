@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"cms-api/config"
 	"cms-api/errors"
 	"cms-api/models"
 	"encoding/json"
@@ -8,6 +9,7 @@ import (
 	"github.com/garyburd/redigo/redis"
 	"github.com/graphql-go/graphql"
 	uuid "github.com/satori/go.uuid"
+	"log"
 	"time"
 )
 
@@ -16,9 +18,10 @@ var (
 )
 
 func init() {
-	conn, err := redis.Dial("tcp", *Config.RedisAddr)
+	log.Println(config.Get().RedisAddr)
+	conn, err := redis.Dial("tcp", config.Get().RedisAddr)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	Redis = conn
 }
@@ -42,7 +45,7 @@ func GenerateToken(user models.User) (string, time.Time, error) {
 func CheckToken(p graphql.ResolveParams) (models.User, error) {
 	ctx := GetContextFromParams(p)
 	user := models.User{}
-	token := ctx.GetHeader(Config.TokenHeader)
+	token := ctx.GetHeader(config.Get().AuthTokenHeader)
 	response, err := Redis.Do("GET", token)
 	if err != nil {
 		return user, &errors.ErrorWithCode{

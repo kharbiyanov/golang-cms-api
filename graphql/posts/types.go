@@ -1,6 +1,7 @@
 package posts
 
 import (
+	"cms-api/models"
 	"github.com/graphql-go/graphql"
 	"strings"
 )
@@ -22,7 +23,7 @@ var GraphQLMetaType = graphql.NewObject(
 	},
 )
 
-func GetPostType(postConfig PostConfig) *graphql.Object {
+func GetPostType(postConfig models.PostConfig) *graphql.Object {
 	return graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: strings.Title(postConfig.Slug),
