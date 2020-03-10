@@ -1,32 +1,35 @@
 package utils
 
 import (
+	"cms-api/config"
 	"cms-api/models"
 	"fmt"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"log"
 )
 
 var DB *gorm.DB
 
 func init() {
+	c := config.Get()
 	db, err := gorm.Open(
 		"postgres",
 		fmt.Sprintf(
 			"host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-			*Config.DB.Host,
-			*Config.DB.Port,
-			*Config.DB.User,
-			*Config.DB.Name,
-			*Config.DB.Pass,
-			*Config.DB.SSL,
+			c.DB.Host,
+			c.DB.Port,
+			c.DB.User,
+			c.DB.Name,
+			c.DB.Pass,
+			c.DB.SSL,
 		),
 	)
 	if err != nil {
-		panic("failed to connect database")
+		log.Panic("failed to connect database")
 	}
 	DB = db
-	DB.LogMode(*Config.Debug)
+	DB.LogMode(c.Debug)
 
-	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.User{}, &models.Post{}, &models.PostMeta{})
 }

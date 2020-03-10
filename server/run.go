@@ -1,26 +1,30 @@
 package server
 
 import (
-	"cms-api/graphql"
+	"cms-api/config"
 	"cms-api/services/auth"
-	"cms-api/utils"
 	"github.com/gin-gonic/gin"
+	"log"
 )
 
-func RunServer() {
-	if ! *utils.Config.Debug {
+func Run() {
+	SetupPlugins()
+
+	c := config.Get()
+	if ! c.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
+
 	r := gin.Default()
 	a := r.Group("/auth")
 	a.POST("/login", auth.LoginHandler)
 	a.POST("/logout", auth.LogoutHandler)
 
 	g := r.Group("/graphql")
-	if *utils.Config.Debug {
-		g.GET("", graphql.GetHandler())
+	if c.Debug {
+		g.GET("", GetHandler())
 	}
-	g.POST("", graphql.GetHandler())
+	g.POST("", GetHandler())
 
-	panic(r.Run(*utils.Config.ServerAddr))
+	log.Panic(r.Run(c.ServerAddr))
 }

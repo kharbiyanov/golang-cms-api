@@ -1,13 +1,14 @@
-package posts
+package main
 
 import (
+	"cms-api/models"
 	"github.com/graphql-go/graphql"
 	"strings"
 )
 
-var GraphQLMetaType = graphql.NewObject(
+var GQMetaType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "Meta",
+		Name: "PostMeta",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
 				Type: graphql.Int,
@@ -22,7 +23,7 @@ var GraphQLMetaType = graphql.NewObject(
 	},
 )
 
-func GetPostType(postConfig PostConfig) *graphql.Object {
+func GetPostType(postConfig models.PostConfig) *graphql.Object {
 	return graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: strings.Title(postConfig.Slug),
@@ -46,14 +47,14 @@ func GetPostType(postConfig PostConfig) *graphql.Object {
 					Type: graphql.NewNonNull(graphql.String),
 				},
 				"meta": &graphql.Field{
-					Type: graphql.NewList(GraphQLMetaType),
+					Type: graphql.NewList(GQMetaType),
 					Args: graphql.FieldConfigArgument{
 						"keys": &graphql.ArgumentConfig{
 							Type: graphql.NewList(graphql.String),
 						},
 					},
 					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-						return GetMeta(params, postConfig)
+						return GetMetaInPost(params)
 					},
 				},
 			},
