@@ -1,0 +1,1 @@
+go build -buildmode=plugin -o ../../plugins/posts.so

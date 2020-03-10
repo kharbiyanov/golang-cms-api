@@ -1,4 +1,4 @@
-package posts
+package main
 
 import (
 	"cms-api/config"
@@ -111,17 +111,18 @@ func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 
 	var post = models.Post{}
 	post.ID = id
+	post.Type = postConfig.Slug
 
 	if err := utils.DB.Delete(&post).Error; err != nil {
 		return nil, err
 	}
-	if err := utils.DB.Where(&models.PostMeta{PostID: id}).Delete(&models.PostMeta{}).Error; err != nil {
+	if err := utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: id}).Error; err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-func GetMeta(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
+func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
 	keys, keysExist := params.Args["keys"].([]interface{})
 	post, postExist := params.Source.(models.Post)
 
@@ -134,8 +135,70 @@ func GetMeta(params graphql.ResolveParams, postConfig models.PostConfig) (interf
 	if keysExist {
 		tx = tx.Where("key in(?)", keys)
 	}
+
 	if err := tx.Model(&post).Association("Meta").Find(&post.Meta).Error; err != nil {
 		return nil, err
 	}
+
 	return post.Meta, nil
+}
+
+func GetMeta(params graphql.ResolveParams) (interface{}, error) {
+	postId, postIdExist := params.Args["post_id"].(int)
+	keys, keysExist := params.Args["keys"].([]interface{})
+
+	if ! postIdExist {
+		return nil, nil
+	}
+
+	var meta []models.PostMeta
+
+	tx := utils.DB.Where(&models.PostMeta{PostID: postId})
+
+	if keysExist {
+		tx = tx.Where("key in(?)", keys)
+	}
+
+	if err := tx.Find(&meta).Error; err != nil {
+		return nil, err
+	}
+	return meta, nil
+}
+
+func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
+	postId, postIdExist := params.Args["post_id"].(int)
+	key, keyExist := params.Args["key"].(string)
+	value, valueExist := params.Args["value"].(string)
+
+	if ! postIdExist || ! keyExist || ! valueExist {
+		return nil, nil
+	}
+
+	meta := models.PostMeta{
+		PostID: postId,
+		Key:    key,
+		Value:  value,
+	}
+
+	if err := utils.DB.Model(&meta).Where(&models.PostMeta{PostID: postId, Key: key}).Update(&meta).Scan(&meta).Error; err != nil {
+		if err := utils.DB.Save(&meta).First(&meta).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return meta, nil
+}
+
+func DeleteMeta(params graphql.ResolveParams) (interface{}, error) {
+	postId, postIdExist := params.Args["post_id"].(int)
+	key, keyExist := params.Args["key"].(string)
+
+	if ! postIdExist || ! keyExist {
+		return nil, nil
+	}
+
+	if err := utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: postId, Key: key}).Error; err != nil {
+		return nil, err
+	}
+	return nil, nil
 }

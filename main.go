@@ -1,9 +1,9 @@
 package main
 
 import (
-	"cms-api/run"
+	"cms-api/server"
 )
 
 func main() {
-	run.Server()
+	server.Run()
 }
