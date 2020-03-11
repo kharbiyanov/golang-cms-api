@@ -26,9 +26,9 @@ func setupQuery() {
 func setupMutation() {
 	mutationFields["langCreate"] = &graphql.Field{
 		Type:        LangType,
-		Description: "Update meta by post_id and meta_key. If the meta field for the post does not exist, it will be added.",
+		Description: "Create new lang.",
 		Args: graphql.FieldConfigArgument{
-			"fullName": &graphql.ArgumentConfig{
+			"full_name": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 			"code": &graphql.ArgumentConfig{
@@ -47,6 +47,21 @@ func setupMutation() {
 			}
 
 			return CreateLang(params)
+		},
+	}
+	mutationFields["langDelete"] = &graphql.Field{
+		Type:        LangType,
+		Description: "Delete lang by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "lang", "delete"); err != nil {
+				return nil, err
+			}
+			return DeleteLang(params)
 		},
 	}
 }

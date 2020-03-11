@@ -11,7 +11,7 @@ var LangType = graphql.NewObject(
 			"id": &graphql.Field{
 				Type: graphql.Int,
 			},
-			"fullName": &graphql.Field{
+			"full_name": &graphql.Field{
 				Type: graphql.String,
 			},
 			"code": &graphql.Field{
