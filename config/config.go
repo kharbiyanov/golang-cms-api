@@ -11,7 +11,6 @@ type config struct {
 	RedisAddr         string              `json:"redisAddr"`
 	DB                db                  `json:"db"`
 	Debug             bool                `json:"debug"`
-	AuthTokenHeader   string              `json:"authTokenHeader"`
 	DefaultPostsLimit int                 `json:"defaultPostsLimit"`
 	PostTypes         []models.PostConfig `json:"postTypes"`
 }
@@ -44,7 +43,6 @@ func init() {
 	viper.SetDefault("db.port", "5432")
 	viper.SetDefault("db.ssl", "disable")
 
-	viper.SetDefault("authTokenHeader", "Auth-Token")
 	viper.SetDefault("defaultPostsLimit", 10)
 
 	if err := viper.Unmarshal(&c); err != nil {
