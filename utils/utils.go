@@ -1,9 +1,11 @@
 package utils
 
 import (
+	"cms-api/errors"
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"golang.org/x/crypto/bcrypt"
+	"strings"
 	"time"
 )
 
@@ -30,4 +32,17 @@ func GetTokenExpDuration(remember bool) time.Duration {
 func GetContextFromParams(p graphql.ResolveParams) *gin.Context {
 	rootValue := p.Info.RootValue.(map[string]interface{})
 	return rootValue["context"].(*gin.Context)
+}
+
+func GetBearerToken(bearer string) (string, error) {
+	token := strings.Split(bearer, "Bearer ")
+
+	if len(token) == 1 {
+		return "", &errors.ErrorWithCode{
+			Message: errors.ForbiddenCodeMessage,
+			Code:    errors.ForbiddenCode,
+		}
+	}
+
+	return token[1], nil
 }

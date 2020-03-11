@@ -45,7 +45,13 @@ func GenerateToken(user models.User) (string, time.Time, error) {
 func CheckToken(p graphql.ResolveParams) (models.User, error) {
 	ctx := GetContextFromParams(p)
 	user := models.User{}
-	token := ctx.GetHeader(config.Get().AuthTokenHeader)
+
+	token, err := GetBearerToken(ctx.GetHeader("Authorization"))
+
+	if err != nil {
+		return user, err
+	}
+
 	response, err := Redis.Do("GET", token)
 	if err != nil {
 		return user, &errors.ErrorWithCode{
