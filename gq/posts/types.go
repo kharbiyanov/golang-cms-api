@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-var GQMetaType = graphql.NewObject(
+var MetaType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "PostMeta",
 		Fields: graphql.Fields{
@@ -47,7 +47,7 @@ func GetPostType(postConfig models.PostConfig) *graphql.Object {
 					Type: graphql.NewNonNull(graphql.String),
 				},
 				"meta": &graphql.Field{
-					Type: graphql.NewList(GQMetaType),
+					Type: graphql.NewList(MetaType),
 					Args: graphql.FieldConfigArgument{
 						"keys": &graphql.ArgumentConfig{
 							Type: graphql.NewList(graphql.String),

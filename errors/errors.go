@@ -13,6 +13,7 @@ const (
 	InvalidLoginErrorMessage     = "Invalid Login"
 	WrongPasswordErrorMessage    = "Wrong Password"
 	PostSlugExistMessage         = "Post Slug Exist"
+	LangCodeExistMessage         = "Lang Code Exist"
 )
 
 type ErrorWithCode struct {

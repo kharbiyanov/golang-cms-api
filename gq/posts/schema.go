@@ -13,7 +13,7 @@ var (
 	mutationFields = graphql.Fields{}
 )
 
-func GetSchemaFields() (graphql.Fields, graphql.Fields) {
+func InitSchema(plugin *models.Plugin) {
 	for _, postConfig := range config.Get().PostTypes {
 		postType := GetPostType(postConfig)
 		setupPostsQuery(postType, postConfig)
@@ -21,7 +21,9 @@ func GetSchemaFields() (graphql.Fields, graphql.Fields) {
 	}
 	setupMetaQuery()
 	setupMetaMutations()
-	return queryFields, mutationFields
+
+	plugin.QueryFields = queryFields
+	plugin.MutationFields = mutationFields
 }
 
 func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
@@ -137,7 +139,7 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 
 func setupMetaQuery() {
 	queryFields["metaGet"] = &graphql.Field{
-		Type:        graphql.NewList(GQMetaType),
+		Type:        graphql.NewList(MetaType),
 		Description: "Get meta by post_id and meta_keys.",
 		Args: graphql.FieldConfigArgument{
 			"post_id": &graphql.ArgumentConfig{
@@ -155,7 +157,7 @@ func setupMetaQuery() {
 
 func setupMetaMutations() {
 	mutationFields["metaUpdate"] = &graphql.Field{
-		Type:        GQMetaType,
+		Type:        MetaType,
 		Description: "Update meta by post_id and meta_key. If the meta field for the post does not exist, it will be added.",
 		Args: graphql.FieldConfigArgument{
 			"post_id": &graphql.ArgumentConfig{
@@ -178,7 +180,7 @@ func setupMetaMutations() {
 	}
 
 	mutationFields["metaDelete"] = &graphql.Field{
-		Type:        GQMetaType,
+		Type:        MetaType,
 		Description: "Delete %s by post_id and meta_key.",
 		Args: graphql.FieldConfigArgument{
 			"post_id": &graphql.ArgumentConfig{
