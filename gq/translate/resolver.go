@@ -68,3 +68,12 @@ func DeleteLang(params graphql.ResolveParams) (interface{}, error) {
 
 	return nil, nil
 }
+
+func GetLangList(params graphql.ResolveParams) (interface{}, error) {
+	var langList []models.Lang
+
+	if err := utils.DB.Find(&langList).Error; err != nil {
+		return nil, err
+	}
+	return langList, nil
+}

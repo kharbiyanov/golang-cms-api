@@ -20,7 +20,13 @@ func InitSchema(plugin *models.Plugin) {
 }
 
 func setupQuery() {
-
+	queryFields["langList"] = &graphql.Field{
+		Type:        graphql.NewList(LangType),
+		Description: "Get lang list.",
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return GetLangList(params)
+		},
+	}
 }
 
 func setupMutation() {

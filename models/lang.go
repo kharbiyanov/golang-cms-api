@@ -9,7 +9,7 @@ type Lang struct {
 	CreatedAt time.Time  `json:"createdAt"`
 	UpdatedAt time.Time  `json:"updatedAt"`
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
-	FullName  string     `gorm:"not null"`
+	FullName  string     `gorm:"not null" json:"full_name"`
 	Code      string     `gorm:"not null; type:varchar(2); unique;"`
 	Flag      string
 	Default   bool
