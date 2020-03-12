@@ -31,5 +31,10 @@ func init() {
 	DB = db
 	DB.LogMode(c.Debug)
 
-	DB.AutoMigrate(&models.User{}, &models.Post{}, &models.PostMeta{})
+	DB.AutoMigrate(
+		&models.User{},
+		&models.Post{},
+		&models.PostMeta{},
+		&models.Lang{},
+	)
 }

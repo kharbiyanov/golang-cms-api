@@ -18,7 +18,6 @@ var (
 )
 
 func init() {
-	log.Println(config.Get().RedisAddr)
 	conn, err := redis.Dial("tcp", config.Get().RedisAddr)
 	if err != nil {
 		log.Panic(err)

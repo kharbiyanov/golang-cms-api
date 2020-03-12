@@ -2,6 +2,7 @@ package server
 
 import (
 	"cms-api/config"
+	"cms-api/models"
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
@@ -62,36 +63,36 @@ func SetupPlugins() {
 	}
 
 	for _, filename := range plugins {
-		query, mutation := getPluginFields(filename)
+		p := pluginInit(filename)
 
-		for key, val := range query {
+		for key, val := range p.QueryFields {
 			queryFields[key] = val
 		}
-		for key, val := range mutation {
+		for key, val := range p.MutationFields {
 			mutationFields[key] = val
 		}
 
 		if config.Get().Debug {
-			log.Printf("Plugin '%s' loaded", filename)
+			log.Printf("Plugin '%s' loaded", p.Name)
 		}
 	}
 }
 
-func getPluginFields(filename string) (graphql.Fields, graphql.Fields) {
+func pluginInit(filename string) models.Plugin {
 	p, err := plugin.Open(filename)
 	if err != nil {
 		panic(err)
 	}
-	symbol, err := p.Lookup("GetSchemaFields")
+	symbol, err := p.Lookup("Init")
 	if err != nil {
 		panic(err)
 	}
 
-	getSchemaFields, ok := symbol.(func() (graphql.Fields, graphql.Fields))
+	init, ok := symbol.(func() models.Plugin)
 
 	if !ok {
-		panic("Plugin has no 'GetSchemaFields() (graphql.Fields, graphql.Fields)' function")
+		panic("Plugin has no 'Init() models.Plugin' function")
 	}
 
-	return getSchemaFields()
+	return init()
 }
