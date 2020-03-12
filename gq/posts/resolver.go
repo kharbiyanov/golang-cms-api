@@ -73,19 +73,19 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 
 	var post models.Post
 
-	if title, titleExist := params.Args["title"].(string); titleExist {
+	if title, ok := params.Args["title"].(string); ok {
 		fields["title"] = title
 	}
-	if content, contentExist := params.Args["content"].(string); contentExist {
+	if content, ok := params.Args["content"].(string); ok {
 		fields["content"] = content
 	}
-	if excerpt, excerptExist := params.Args["excerpt"].(string); excerptExist {
+	if excerpt, ok := params.Args["excerpt"].(string); ok {
 		fields["excerpt"] = excerpt
 	}
-	if status, statusExist := params.Args["status"].(string); statusExist {
+	if status, ok := params.Args["status"].(string); ok {
 		fields["status"] = status
 	}
-	if slug, slugExist := params.Args["slug"].(string); slugExist {
+	if slug, ok := params.Args["slug"].(string); ok {
 		fields["slug"] = slug
 		if ! utils.DB.Where(&models.Post{Type: postConfig.Slug, Slug: slug}).Not(&models.Post{ID: id}).First(&post).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
