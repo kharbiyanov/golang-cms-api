@@ -20,7 +20,6 @@ jobs:
           key: go-mod-v1-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      - run: ls -la
       - run:
           name: Deploy
           command: |
