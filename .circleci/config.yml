@@ -24,7 +24,7 @@ jobs:
           name: Deploy
           command: |
             ssh-keyscan $SSH_HOST_TEST >> ~/.ssh/known_hosts
-            scp main $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/apis
+            scp main $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
             scp -r plugins $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
             scp rbac_model.conf $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
             ssh -T $SSH_USER_TEST@$SSH_HOST_TEST sh /home/cms/docker/cms.ux.uz/test/api/rebuild.sh
