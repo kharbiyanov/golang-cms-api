@@ -79,6 +79,7 @@ func SetupPlugins() {
 }
 
 func pluginInit(filename string) models.Plugin {
+	log.Println(filename)
 	p, err := plugin.Open(filename)
 	if err != nil {
 		panic(err)
