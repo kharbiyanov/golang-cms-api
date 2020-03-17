@@ -1,0 +1,39 @@
+version: 2.1
+jobs:
+  build-deploy-test:
+    working_directory: /go/src/cms-api
+    docker:
+      - image: circleci/golang:1.13.8
+        environment:
+          GO111MODULE: "on"
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "7a:65:72:a8:28:11:0a:3b:88:db:d5:b4:af:05:45:78"
+      - restore_cache:
+          keys:
+            - go-mod-v1-{{ checksum "go.sum" }}
+      - run: go get -d -v ./...
+      - run: sh run-build.sh
+      - save_cache:
+          key: go-mod-v1-{{ checksum "go.sum" }}
+          paths:
+            - "/go/pkg/mod"
+      - run: ls -la
+      - run:
+          name: Deploy
+          command: |
+            ssh-keyscan $SSH_HOST_TEST >> ~/.ssh/known_hosts
+            scp main $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
+            scp rbac_model.conf $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
+            ssh -T $SSH_USER_TEST@$SSH_HOST_TEST sh /home/cms/docker/cms.ux.uz/test/api/rebuild.sh
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build-deploy-test:
+          filters:
+            branches:
+              only: test
