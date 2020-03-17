@@ -57,8 +57,6 @@ func init() {
 		log.Panicf("Unable to decode into struct, %v", err)
 	}
 
-	log.Println(c)
-
 	if c.DB.Name == "" {
 		log.Panic("db.name is not specified in config file")
 	}
