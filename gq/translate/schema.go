@@ -24,7 +24,7 @@ func setupQuery() {
 		Type:        graphql.NewList(LangType),
 		Description: "Get lang list.",
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			return GetLangList(params)
+			return GetLangList()
 		},
 	}
 }
@@ -68,6 +68,34 @@ func setupMutation() {
 				return nil, err
 			}
 			return DeleteLang(params)
+		},
+	}
+	mutationFields["langUpdate"] = &graphql.Field{
+		Type:        LangType,
+		Description: "Update lang by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"full_name": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"code": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"flag": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"default": &graphql.ArgumentConfig{
+				Type: graphql.Boolean,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "lang", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateLang(params)
 		},
 	}
 }

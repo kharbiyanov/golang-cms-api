@@ -69,11 +69,48 @@ func DeleteLang(params graphql.ResolveParams) (interface{}, error) {
 	return nil, nil
 }
 
-func GetLangList(params graphql.ResolveParams) (interface{}, error) {
+func GetLangList() (interface{}, error) {
 	var langList []models.Lang
 
 	if err := utils.DB.Find(&langList).Error; err != nil {
 		return nil, err
 	}
 	return langList, nil
+}
+
+func UpdateLang(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	def, defExist := params.Args["default"].(bool)
+	fields := make(map[string]interface{})
+
+	var lang models.Lang
+
+	if fullName, ok := params.Args["full_name"].(string); ok {
+		fields["full_name"] = fullName
+	}
+	if flag, ok := params.Args["flag"].(string); ok {
+		fields["flag"] = flag
+	}
+	if code, ok := params.Args["code"].(string); ok {
+		fields["code"] = code
+		if ! utils.DB.Where(&models.Lang{Code: code}).Not(&models.Lang{ID: id}).First(&lang).RecordNotFound() {
+			return nil, &errors.ErrorWithCode{
+				Message: errors.LangCodeExistMessage,
+				Code:    errors.InvalidParamsCode,
+			}
+		}
+	}
+	if defExist {
+		fields["default"] = def
+		if def {
+			utils.DB.Model(&models.Lang{}).Where(&models.Lang{Default: true}).Update("default", false)
+		}
+	}
+
+	lang.ID = id
+
+	if err := utils.DB.Model(&lang).Updates(fields).Scan(&lang).Error; err != nil {
+		return nil, err
+	}
+	return lang, nil
 }
