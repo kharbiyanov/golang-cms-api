@@ -62,6 +62,8 @@ func SetupPlugins() {
 		panic(err)
 	}
 
+	log.Println("plugins!!!!!!!!!!!!!", plugins)
+
 	for _, filename := range plugins {
 		p := pluginInit(filename)
 
@@ -79,7 +81,6 @@ func SetupPlugins() {
 }
 
 func pluginInit(filename string) models.Plugin {
-	log.Println(filename)
 	p, err := plugin.Open(filename)
 	if err != nil {
 		panic(err)
