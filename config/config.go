@@ -2,8 +2,10 @@ package config
 
 import (
 	"cms-api/models"
+	"fmt"
 	"github.com/spf13/viper"
 	"log"
+	"os"
 )
 
 type config struct {
@@ -27,6 +29,12 @@ type db struct {
 var c = config{}
 
 func init() {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(dir)
+
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
 	viper.AddConfigPath(".")
@@ -48,6 +56,8 @@ func init() {
 	if err := viper.Unmarshal(&c); err != nil {
 		log.Panicf("Unable to decode into struct, %v", err)
 	}
+
+	log.Println(c)
 
 	if c.DB.Name == "" {
 		log.Panic("db.name is not specified in config file")
