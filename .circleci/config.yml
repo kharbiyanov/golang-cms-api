@@ -24,10 +24,11 @@ jobs:
           name: Deploy
           command: |
             ssh-keyscan $SSH_HOST_TEST >> ~/.ssh/known_hosts
+            ssh -T $SSH_USER_TEST@$SSH_HOST_TEST docker-compose -f /home/cms/docker/cms.ux.uz/test/api/docker-compose.yml stop
             scp main $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
             scp -r plugins $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
             scp rbac_model.conf $SSH_USER_TEST@$SSH_HOST_TEST:/home/cms/docker/cms.ux.uz/test/api
-            ssh -T $SSH_USER_TEST@$SSH_HOST_TEST sh /home/cms/docker/cms.ux.uz/test/api/rebuild.sh
+            ssh -T $SSH_USER_TEST@$SSH_HOST_TEST docker-compose -f /home/cms/docker/cms.ux.uz/test/api/docker-compose.yml start
 
 workflows:
   version: 2
