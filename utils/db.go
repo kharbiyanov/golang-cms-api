@@ -36,5 +36,6 @@ func init() {
 		&models.Post{},
 		&models.PostMeta{},
 		&models.Lang{},
+		&models.Translation{},
 	)
 }
