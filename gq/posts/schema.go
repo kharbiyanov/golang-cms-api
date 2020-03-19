@@ -44,6 +44,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 		Type:        graphql.NewList(postType),
 		Description: fmt.Sprintf("Get %s list.", postConfig.Slug),
 		Args: graphql.FieldConfigArgument{
+			"lang": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"first": &graphql.ArgumentConfig{
 				Type: graphql.Int,
 			},
@@ -62,6 +65,9 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 		Type:        postType,
 		Description: fmt.Sprintf("Create new %s.", postConfig.Slug),
 		Args: graphql.FieldConfigArgument{
+			"lang": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"title": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},

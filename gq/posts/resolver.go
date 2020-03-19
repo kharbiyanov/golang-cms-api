@@ -5,12 +5,13 @@ import (
 	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
+	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
 func GetPost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
 	id, idExist := params.Args["id"].(int)
-	if ! idExist {
+	if !idExist {
 		return nil, nil
 	}
 
@@ -24,12 +25,17 @@ func GetPost(params graphql.ResolveParams, postConfig models.PostConfig) (interf
 }
 
 func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
+	lang, _ := params.Args["lang"].(string)
 	first, firstExist := params.Args["first"].(int)
 	offset, offsetExist := params.Args["offset"].(int)
 
 	var posts []models.Post
 
-	tx := utils.DB.Where(&models.Post{Type: postConfig.Slug})
+	tx := utils.DB.Table("posts").
+		Select("posts.*").
+		Joins("left join translations on translations.element_id = posts.id").
+		Where("posts.type = ? and translations.lang = ? and translations.element_type = ?", postConfig.Slug, lang, fmt.Sprintf("post_%s", postConfig.Slug))
+
 	if firstExist {
 		tx = tx.Limit(first)
 	} else {
@@ -54,7 +60,9 @@ func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 		Type:    postConfig.Slug,
 	}
 
-	if ! utils.DB.Where(&models.Post{Slug: post.Slug, Type: postConfig.Slug}).First(&post).RecordNotFound() {
+	lang, _ := params.Args["lang"].(string)
+
+	if !utils.DB.Where(&models.Post{Slug: post.Slug, Type: postConfig.Slug}).First(&post).RecordNotFound() {
 		return nil, &errors.ErrorWithCode{
 			Message: errors.PostSlugExistMessage,
 			Code:    errors.InvalidParamsCode,
@@ -64,6 +72,17 @@ func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	if err := utils.DB.Create(post).Scan(post).Error; err != nil {
 		return nil, err
 	}
+
+	translation := models.Translation{
+		ElementType: fmt.Sprintf("post_%s", postConfig.Slug),
+		ElementID:   post.ID,
+		Lang:        lang,
+	}
+
+	if err := utils.DB.Create(&translation).Scan(&translation).Error; err != nil {
+		return nil, err
+	}
+
 	return post, nil
 }
 
@@ -87,7 +106,7 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	}
 	if slug, ok := params.Args["slug"].(string); ok {
 		fields["slug"] = slug
-		if ! utils.DB.Where(&models.Post{Type: postConfig.Slug, Slug: slug}).Not(&models.Post{ID: id}).First(&post).RecordNotFound() {
+		if !utils.DB.Where(&models.Post{Type: postConfig.Slug, Slug: slug}).Not(&models.Post{ID: id}).First(&post).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
 				Message: errors.PostSlugExistMessage,
 				Code:    errors.InvalidParamsCode,
@@ -105,7 +124,7 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 
 func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
 	id, idExist := params.Args["id"].(int)
-	if ! idExist {
+	if !idExist {
 		return nil, nil
 	}
 
@@ -126,7 +145,7 @@ func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
 	keys, keysExist := params.Args["keys"].([]interface{})
 	post, postExist := params.Source.(models.Post)
 
-	if ! postExist {
+	if !postExist {
 		return nil, nil
 	}
 
@@ -147,7 +166,7 @@ func GetMeta(params graphql.ResolveParams) (interface{}, error) {
 	postId, postIdExist := params.Args["post_id"].(int)
 	keys, keysExist := params.Args["keys"].([]interface{})
 
-	if ! postIdExist {
+	if !postIdExist {
 		return nil, nil
 	}
 
@@ -170,7 +189,7 @@ func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
 	key, keyExist := params.Args["key"].(string)
 	value, valueExist := params.Args["value"].(string)
 
-	if ! postIdExist || ! keyExist || ! valueExist {
+	if !postIdExist || !keyExist || !valueExist {
 		return nil, nil
 	}
 
@@ -193,7 +212,7 @@ func DeleteMeta(params graphql.ResolveParams) (interface{}, error) {
 	postId, postIdExist := params.Args["post_id"].(int)
 	key, keyExist := params.Args["key"].(string)
 
-	if ! postIdExist || ! keyExist {
+	if !postIdExist || !keyExist {
 		return nil, nil
 	}
 
