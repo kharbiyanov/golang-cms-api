@@ -71,11 +71,42 @@ func setupMutation() {
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, "terms", "create"); err != nil {
+			if err := utils.ValidateUser(params, "term", "create"); err != nil {
 				return nil, err
 			}
 
 			return CreateTerm(params)
+		},
+	}
+	mutationFields["termUpdate"] = &graphql.Field{
+		Type:        TermType,
+		Description: "Update term by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"taxonomy": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"name": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"slug": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"description": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"parent": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "term", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateTerm(params)
 		},
 	}
 }

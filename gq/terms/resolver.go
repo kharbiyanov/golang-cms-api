@@ -80,3 +80,44 @@ func GetTerms(params graphql.ResolveParams) (interface{}, error) {
 	}
 	return terms, nil
 }
+
+func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	tax, _ := params.Args["taxonomy"].(string)
+
+	fields := make(map[string]interface{})
+
+	var term models.Term
+
+	if name, ok := params.Args["name"].(string); ok {
+		fields["name"] = name
+	}
+	if description, ok := params.Args["description"].(string); ok {
+		fields["description"] = description
+	}
+	if parent, ok := params.Args["parent"].(int); ok {
+		fields["parent"] = parent
+		if utils.DB.Where(&models.Term{ID: parent, Taxonomy: tax}).First(&models.Term{}).RecordNotFound() {
+			return nil, &errors.ErrorWithCode{
+				Message: errors.TermParentIDNotFoundMessage,
+				Code:    errors.InvalidParamsCode,
+			}
+		}
+	}
+	if slug, ok := params.Args["slug"].(string); ok {
+		fields["slug"] = slug
+		if !utils.DB.Where(&models.Term{Taxonomy: tax, Slug: slug}).Not(&models.Term{ID: id}).First(&term).RecordNotFound() {
+			return nil, &errors.ErrorWithCode{
+				Message: errors.PostSlugExistMessage,
+				Code:    errors.InvalidParamsCode,
+			}
+		}
+	}
+
+	term.ID = id
+
+	if err := utils.DB.Model(&term).Updates(fields).Scan(&term).Error; err != nil {
+		return nil, err
+	}
+	return term, nil
+}
