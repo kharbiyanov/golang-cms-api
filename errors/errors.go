@@ -13,6 +13,8 @@ const (
 	InvalidLoginErrorMessage     = "Invalid Login"
 	WrongPasswordErrorMessage    = "Wrong Password"
 	PostSlugExistMessage         = "Post Slug Exist"
+	TermSlugExistMessage         = "Term Slug Exist"
+	TermParentIDNotFoundMessage  = "Term Parent ID Not Found"
 	LangCodeExistMessage         = "Lang Code Exist"
 )
 
