@@ -20,7 +20,30 @@ func InitSchema(plugin *models.Plugin) {
 }
 
 func setupQuery() {
-
+	queryFields["termGetList"] = &graphql.Field{
+		Type:        graphql.NewList(TermType),
+		Description: "Get term list.",
+		Args: graphql.FieldConfigArgument{
+			"lang": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"taxonomy": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"parent": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"first": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"offset": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return GetTerms(params)
+		},
+	}
 }
 
 func setupMutation() {

@@ -54,3 +54,29 @@ func CreateTerm(params graphql.ResolveParams) (interface{}, error) {
 
 	return term, nil
 }
+
+func GetTerms(params graphql.ResolveParams) (interface{}, error) {
+	lang, _ := params.Args["lang"].(string)
+	tax, _ := params.Args["taxonomy"].(string)
+
+	var terms []models.Term
+
+	tx := utils.DB.Table("terms").
+		Select("terms.*").
+		Joins("left join translations on translations.element_id = terms.id").
+		Where("terms.taxonomy = ? and translations.lang = ? and translations.element_type = ?", tax, lang, fmt.Sprintf("tax_%s", tax))
+
+	if parent, ok := params.Args["parent"].(int); ok {
+		tx = tx.Where("terms.parent = ?", parent)
+	}
+	if first, ok := params.Args["first"].(int); ok {
+		tx = tx.Limit(first)
+	}
+	if offset, ok := params.Args["offset"].(int); ok {
+		tx = tx.Offset(offset)
+	}
+	if err := tx.Find(&terms).Error; err != nil {
+		return nil, err
+	}
+	return terms, nil
+}
