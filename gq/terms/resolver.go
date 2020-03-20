@@ -121,3 +121,19 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 	}
 	return term, nil
 }
+
+func DeleteTerm(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+
+	term := models.Term{}
+
+	if utils.DB.First(&term, id).RecordNotFound() {
+		return nil, nil
+	}
+
+	if err := utils.DB.Delete(term).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, nil
+}
