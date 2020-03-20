@@ -109,4 +109,19 @@ func setupMutation() {
 			return UpdateTerm(params)
 		},
 	}
+	mutationFields["termDelete"] = &graphql.Field{
+		Type:        TermType,
+		Description: "Delete term by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "term", "delete"); err != nil {
+				return nil, err
+			}
+			return DeleteTerm(params)
+		},
+	}
 }
