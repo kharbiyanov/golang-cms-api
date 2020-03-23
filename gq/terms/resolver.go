@@ -137,3 +137,44 @@ func DeleteTerm(params graphql.ResolveParams) (interface{}, error) {
 
 	return nil, utils.DB.Delete(term).Error
 }
+
+func GetMetaInTerm(params graphql.ResolveParams) (interface{}, error) {
+	keys, keysExist := params.Args["keys"].([]interface{})
+	term, termExist := params.Source.(models.Term)
+
+	if !termExist {
+		return nil, nil
+	}
+
+	tx := utils.DB
+
+	if keysExist {
+		tx = tx.Where("key in(?)", keys)
+	}
+
+	if err := tx.Model(&term).Association("Meta").Find(&term.Meta).Error; err != nil {
+		return nil, err
+	}
+
+	return term.Meta, nil
+}
+
+func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
+	termId, _ := params.Args["term_id"].(int)
+	key, _ := params.Args["key"].(string)
+	value, _ := params.Args["value"].(string)
+
+	meta := models.TermMeta{
+		TermID: termId,
+		Key:    key,
+		Value:  value,
+	}
+
+	if err := utils.DB.Model(&meta).Where(&models.TermMeta{TermID: termId, Key: key}).Update(&meta).Scan(&meta).Error; err != nil {
+		if err := utils.DB.Save(&meta).First(&meta).Error; err != nil {
+			return nil, err
+		}
+	}
+
+	return meta, nil
+}

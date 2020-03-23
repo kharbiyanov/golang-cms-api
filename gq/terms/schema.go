@@ -124,4 +124,26 @@ func setupMutation() {
 			return DeleteTerm(params)
 		},
 	}
+	mutationFields["termMetaUpdate"] = &graphql.Field{
+		Type:        MetaType,
+		Description: "Update term meta by term_id and meta_key. If the meta field for the post does not exist, it will be added.",
+		Args: graphql.FieldConfigArgument{
+			"term_id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"key": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"value": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "termMeta", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateMeta(params)
+		},
+	}
 }

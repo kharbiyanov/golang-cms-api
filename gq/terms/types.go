@@ -51,7 +51,7 @@ var TermType = graphql.NewObject(
 					},
 				},
 				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					return nil, nil
+					return GetMetaInTerm(params)
 				},
 			},
 		},
