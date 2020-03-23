@@ -146,4 +146,23 @@ func setupMutation() {
 			return UpdateMeta(params)
 		},
 	}
+	mutationFields["termMetaDelete"] = &graphql.Field{
+		Type:        MetaType,
+		Description: "Delete %s by term_id and meta_key.",
+		Args: graphql.FieldConfigArgument{
+			"term_id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"key": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "termMeta", "delete"); err != nil {
+				return nil, err
+			}
+
+			return DeleteMeta(params)
+		},
+	}
 }

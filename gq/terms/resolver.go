@@ -178,3 +178,10 @@ func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
 
 	return meta, nil
 }
+
+func DeleteMeta(params graphql.ResolveParams) (interface{}, error) {
+	termId, _ := params.Args["term_id"].(int)
+	key, _ := params.Args["key"].(string)
+
+	return nil, utils.DB.Delete(&models.TermMeta{}, &models.TermMeta{TermID: termId, Key: key}).Error
+}
