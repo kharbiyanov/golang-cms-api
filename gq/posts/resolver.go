@@ -10,10 +10,7 @@ import (
 )
 
 func GetPost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
-	id, idExist := params.Args["id"].(int)
-	if !idExist {
-		return nil, nil
-	}
+	id, _ := params.Args["id"].(int)
 
 	var post = models.Post{}
 	post.ID = id
@@ -52,12 +49,18 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
 	post := &models.Post{
-		Title:   params.Args["title"].(string),
-		Content: params.Args["content"].(string),
-		Excerpt: params.Args["excerpt"].(string),
-		Status:  params.Args["status"].(int),
-		Slug:    params.Args["slug"].(string),
-		Type:    postConfig.Slug,
+		Title:  params.Args["title"].(string),
+		Status: params.Args["status"].(int),
+		Slug:   params.Args["slug"].(string),
+		Type:   postConfig.Slug,
+	}
+
+	if content, ok := params.Args["content"].(string); ok {
+		post.Content = content
+	}
+
+	if excerpt, ok := params.Args["excerpt"].(string); ok {
+		post.Excerpt = excerpt
 	}
 
 	lang, _ := params.Args["lang"].(string)
@@ -123,10 +126,7 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 }
 
 func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
-	id, idExist := params.Args["id"].(int)
-	if !idExist {
-		return nil, nil
-	}
+	id, _ := params.Args["id"].(int)
 
 	var post = models.Post{}
 	post.ID = id
@@ -135,10 +135,7 @@ func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	if err := utils.DB.Delete(&post).Error; err != nil {
 		return nil, err
 	}
-	if err := utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: id}).Error; err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return nil, utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: id}).Error
 }
 
 func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
@@ -163,12 +160,8 @@ func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func GetMeta(params graphql.ResolveParams) (interface{}, error) {
-	postId, postIdExist := params.Args["post_id"].(int)
+	postId, _ := params.Args["post_id"].(int)
 	keys, keysExist := params.Args["keys"].([]interface{})
-
-	if !postIdExist {
-		return nil, nil
-	}
 
 	var meta []models.PostMeta
 
@@ -185,13 +178,9 @@ func GetMeta(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
-	postId, postIdExist := params.Args["post_id"].(int)
-	key, keyExist := params.Args["key"].(string)
-	value, valueExist := params.Args["value"].(string)
-
-	if !postIdExist || !keyExist || !valueExist {
-		return nil, nil
-	}
+	postId, _ := params.Args["post_id"].(int)
+	key, _ := params.Args["key"].(string)
+	value, _ := params.Args["value"].(string)
 
 	meta := models.PostMeta{
 		PostID: postId,
@@ -209,15 +198,8 @@ func UpdateMeta(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func DeleteMeta(params graphql.ResolveParams) (interface{}, error) {
-	postId, postIdExist := params.Args["post_id"].(int)
-	key, keyExist := params.Args["key"].(string)
+	postId, _ := params.Args["post_id"].(int)
+	key, _ := params.Args["key"].(string)
 
-	if !postIdExist || !keyExist {
-		return nil, nil
-	}
-
-	if err := utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: postId, Key: key}).Error; err != nil {
-		return nil, err
-	}
-	return nil, nil
+	return nil, utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: postId, Key: key}).Error
 }

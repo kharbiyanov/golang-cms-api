@@ -32,7 +32,7 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 		Description: fmt.Sprintf("Get %s by id.", postConfig.Slug),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
-				Type: graphql.Int,
+				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {

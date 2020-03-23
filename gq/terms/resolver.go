@@ -108,7 +108,7 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 		fields["slug"] = slug
 		if !utils.DB.Where(&models.Term{Taxonomy: tax, Slug: slug}).Not(&models.Term{ID: id}).First(&term).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
-				Message: errors.PostSlugExistMessage,
+				Message: errors.TermSlugExistMessage,
 				Code:    errors.InvalidParamsCode,
 			}
 		}
@@ -119,6 +119,7 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 	if err := utils.DB.Model(&term).Updates(fields).Scan(&term).Error; err != nil {
 		return nil, err
 	}
+
 	return term, nil
 }
 
@@ -128,12 +129,11 @@ func DeleteTerm(params graphql.ResolveParams) (interface{}, error) {
 	term := models.Term{}
 
 	if utils.DB.First(&term, id).RecordNotFound() {
-		return nil, nil
+		return nil, &errors.ErrorWithCode{
+			Message: errors.TermNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
 	}
 
-	if err := utils.DB.Delete(term).Error; err != nil {
-		return nil, err
-	}
-
-	return nil, nil
+	return nil, utils.DB.Delete(term).Error
 }
