@@ -37,6 +37,7 @@ func init() {
 		&models.PostMeta{},
 		&models.Term{},
 		&models.TermMeta{},
+		&models.TermRelationship{},
 		&models.Lang{},
 		&models.Translation{},
 	)

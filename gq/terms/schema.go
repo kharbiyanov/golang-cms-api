@@ -165,4 +165,23 @@ func setupMutation() {
 			return DeleteMeta(params)
 		},
 	}
+	mutationFields["setTerms"] = &graphql.Field{
+		Type:        MetaType,
+		Description: "Set terms by post id.",
+		Args: graphql.FieldConfigArgument{
+			"post_id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"terms": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.NewList(graphql.Int)),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "term", "set"); err != nil {
+				return nil, err
+			}
+
+			return SetTerms(params)
+		},
+	}
 }

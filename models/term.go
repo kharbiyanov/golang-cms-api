@@ -26,3 +26,8 @@ type TermMeta struct {
 	Key       string `gorm:"type:varchar(255)"`
 	Value     string
 }
+
+type TermRelationship struct {
+	PostID int
+	TermID int
+}

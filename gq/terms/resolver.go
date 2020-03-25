@@ -6,6 +6,7 @@ import (
 	"cms-api/utils"
 	"fmt"
 	"github.com/graphql-go/graphql"
+	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 )
 
 func CreateTerm(params graphql.ResolveParams) (interface{}, error) {
@@ -184,4 +185,26 @@ func DeleteMeta(params graphql.ResolveParams) (interface{}, error) {
 	key, _ := params.Args["key"].(string)
 
 	return nil, utils.DB.Delete(&models.TermMeta{}, &models.TermMeta{TermID: termId, Key: key}).Error
+}
+
+func SetTerms(params graphql.ResolveParams) (interface{}, error) {
+	// TODO: проверка на существование термов
+
+	postId, _ := params.Args["post_id"].(int)
+	terms, _ := params.Args["terms"].([]interface{})
+
+	var insertTerms []interface{}
+
+	for _, termId := range terms {
+		insertTerms = append(insertTerms, models.TermRelationship{
+			PostID: postId,
+			TermID: termId.(int),
+		})
+	}
+
+	if err := utils.DB.Where("post_id = ?", postId).Delete(&models.TermRelationship{}).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, gormbulk.BulkInsert(utils.DB, insertTerms, 3000)
 }
