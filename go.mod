@@ -6,6 +6,7 @@ require (
 	github.com/casbin/casbin v1.9.1
 	github.com/casbin/gorm-adapter v1.0.0
 	github.com/garyburd/redigo v1.6.0
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.1
 	github.com/graphql-go/graphql v0.7.9
 	github.com/graphql-go/handler v0.2.3
