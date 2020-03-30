@@ -27,11 +27,12 @@ func Run() {
 	}
 	graphqlGroup.POST("/", GetHandler())
 
-	//corsConfig := cors.DefaultConfig()
-	//corsConfig.AllowOrigins = []string{"http://localhost:8000"}
-	//router.Use(cors.New(corsConfig))
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowOrigins = []string{"http://localhost:8000"}
+	corsConfig.AllowCredentials = true
+	router.Use(cors.New(corsConfig))
 
-	router.Use(cors.Default())
+	//router.Use(cors.Default())
 
 	log.Panic(router.Run(c.ServerAddr))
 }
