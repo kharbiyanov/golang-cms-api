@@ -18,6 +18,16 @@ func Run() {
 	}
 
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8000"},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
+		AllowHeaders:     []string{"Authorization", "Content-Type", "Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
 	authGroup := router.Group("/auth/")
 	authGroup.POST("/login/", auth.LoginHandler)
 	authGroup.POST("/logout/", auth.LogoutHandler)
@@ -27,15 +37,6 @@ func Run() {
 		graphqlGroup.GET("/", GetHandler())
 	}
 	graphqlGroup.POST("/", GetHandler())
-
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:8000"},
-		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
-		AllowHeaders:     []string{"Authorization", "Content-Type", "Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: false,
-		MaxAge:           12 * time.Hour,
-	}))
 
 	//router.Use(cors.Default())
 
