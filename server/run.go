@@ -6,6 +6,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 )
 
 func Run() {
@@ -27,10 +28,14 @@ func Run() {
 	}
 	graphqlGroup.POST("/", GetHandler())
 
-	corsConfig := cors.DefaultConfig()
-	corsConfig.AllowOrigins = []string{"http://localhost:8000"}
-	corsConfig.AllowCredentials = true
-	router.Use(cors.New(corsConfig))
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8000"},
+		AllowMethods:     []string{"POST", "GET"},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Authorization", "Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	//router.Use(cors.Default())
 
