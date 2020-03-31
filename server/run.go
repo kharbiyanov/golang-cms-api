@@ -38,7 +38,5 @@ func Run() {
 	}
 	graphqlGroup.POST("/", GetHandler())
 
-	//router.Use(cors.Default())
-
 	log.Panic(router.Run(c.ServerAddr))
 }

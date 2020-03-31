@@ -3,6 +3,7 @@ package main
 import (
 	"cms-api/config"
 	"cms-api/models"
+	"cms-api/scalars"
 	"cms-api/utils"
 	"fmt"
 	"github.com/graphql-go/graphql"
@@ -48,10 +49,24 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 				Type: graphql.NewNonNull(graphql.String),
 			},
 			"first": &graphql.ArgumentConfig{
-				Type: graphql.Int,
+				Type:         graphql.Int,
+				DefaultValue: config.Get().DefaultPostsLimit,
 			},
 			"offset": &graphql.ArgumentConfig{
 				Type: graphql.Int,
+			},
+			"order_by": &graphql.ArgumentConfig{
+				Type:         graphql.String,
+				DefaultValue: "date",
+				Description:  "Available params: date, updated, author, title, content, status, slug",
+			},
+			"order": &graphql.ArgumentConfig{
+				Type:         graphql.String,
+				DefaultValue: "desc",
+				Description:  "Available params: asc, desc",
+			},
+			"tax_query": &graphql.ArgumentConfig{
+				Type: scalars.JSON,
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {

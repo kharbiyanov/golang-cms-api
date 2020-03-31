@@ -30,8 +30,16 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 
 	tx := utils.DB.Table("posts").
 		Select("posts.*").
-		Joins("left join translations on translations.element_id = posts.id").
-		Where("posts.type = ? and translations.lang = ? and translations.element_type = ?", postConfig.Slug, lang, fmt.Sprintf("post_%s", postConfig.Slug))
+		Joins("LEFT JOIN translations t ON t.element_id = posts.id").
+		Where("posts.type = ? AND t.lang = ? AND t.element_type = ?", postConfig.Slug, lang, fmt.Sprintf("post_%s", postConfig.Slug))
+
+	tx, taxErr := SetTaxQuery(tx, params)
+
+	if taxErr != nil {
+		return nil, taxErr
+	}
+
+	tx = SetOrder(tx, params)
 
 	if firstExist {
 		tx = tx.Limit(first)
@@ -41,6 +49,9 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 	if offsetExist {
 		tx = tx.Offset(offset)
 	}
+
+	tx = tx.Group("posts.id")
+
 	if err := tx.Find(&posts).Error; err != nil {
 		return nil, err
 	}

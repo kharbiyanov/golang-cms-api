@@ -31,3 +31,10 @@ type TermRelationship struct {
 	PostID int
 	TermID int
 }
+
+type TaxQuery struct {
+	Taxonomy string
+	Terms    []interface{}
+	Operator string
+	Field    string
+}
