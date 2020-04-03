@@ -11,7 +11,6 @@ func CreateLang(params graphql.ResolveParams) (interface{}, error) {
 	lang := &models.Lang{
 		FullName: params.Args["full_name"].(string),
 		Code:     params.Args["code"].(string),
-		Flag:     params.Args["flag"].(string),
 	}
 
 	if flag, ok := params.Args["flag"].(string); ok {
@@ -26,7 +25,7 @@ func CreateLang(params graphql.ResolveParams) (interface{}, error) {
 		lang.Default = true
 	}
 
-	if ! utils.DB.Where(&models.Lang{Code: lang.Code}).First(&lang).RecordNotFound() {
+	if !utils.DB.Where(&models.Lang{Code: lang.Code}).First(&lang).RecordNotFound() {
 		return nil, &errors.ErrorWithCode{
 			Message: errors.LangCodeExistMessage,
 			Code:    errors.InvalidParamsCode,
@@ -40,16 +39,15 @@ func CreateLang(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func DeleteLang(params graphql.ResolveParams) (interface{}, error) {
-	id, idExist := params.Args["id"].(int)
-
-	if ! idExist {
-		return nil, nil
-	}
+	id, _ := params.Args["id"].(int)
 
 	lang := models.Lang{}
 
 	if utils.DB.First(&lang, id).RecordNotFound() {
-		return nil, nil
+		return nil, &errors.ErrorWithCode{
+			Message: errors.LangNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
 	}
 
 	if err := utils.DB.Delete(lang).Error; err != nil {
@@ -59,10 +57,13 @@ func DeleteLang(params graphql.ResolveParams) (interface{}, error) {
 	if lang.Default {
 		newDefaultLang := models.Lang{}
 		if utils.DB.First(&newDefaultLang).RecordNotFound() {
-			return nil, nil
+			return nil, &errors.ErrorWithCode{
+				Message: errors.LangNotFoundMessage,
+				Code:    errors.InvalidParamsCode,
+			}
 		}
 		if err := utils.DB.Model(&newDefaultLang).Updates(models.Lang{Default: true}).Error; err != nil {
-			return nil, nil
+			return nil, err
 		}
 	}
 
@@ -93,7 +94,7 @@ func UpdateLang(params graphql.ResolveParams) (interface{}, error) {
 	}
 	if code, ok := params.Args["code"].(string); ok {
 		fields["code"] = code
-		if ! utils.DB.Where(&models.Lang{Code: code}).Not(&models.Lang{ID: id}).First(&lang).RecordNotFound() {
+		if !utils.DB.Where(&models.Lang{Code: code}).Not(&models.Lang{ID: id}).First(&lang).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
 				Message: errors.LangCodeExistMessage,
 				Code:    errors.InvalidParamsCode,

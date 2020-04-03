@@ -3,28 +3,40 @@ package server
 import (
 	"cms-api/config"
 	"cms-api/services/auth"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
+	"time"
 )
 
 func Run() {
 	SetupPlugins()
 
 	c := config.Get()
-	if ! c.Debug {
+	if !c.Debug {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	r := gin.Default()
-	a := r.Group("/auth")
-	a.POST("/login", auth.LoginHandler)
-	a.POST("/logout", auth.LogoutHandler)
+	router := gin.Default()
 
-	g := r.Group("/graphql")
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:8000"},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS"},
+		AllowHeaders:     []string{"Authorization", "Content-Type", "Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
+
+	authGroup := router.Group("/auth/")
+	authGroup.POST("/login/", auth.LoginHandler)
+	authGroup.POST("/logout/", auth.LogoutHandler)
+
+	graphqlGroup := router.Group("/graphql/")
 	if c.Debug {
-		g.GET("", GetHandler())
+		graphqlGroup.GET("/", GetHandler())
 	}
-	g.POST("", GetHandler())
+	graphqlGroup.POST("/", GetHandler())
 
-	log.Panic(r.Run(c.ServerAddr))
+	log.Panic(router.Run(c.ServerAddr))
 }
