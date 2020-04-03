@@ -39,6 +39,12 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 		return nil, taxErr
 	}
 
+	tx, metaErr := SetMetaQuery(tx, params)
+
+	if metaErr != nil {
+		return nil, metaErr
+	}
+
 	tx = SetOrder(tx, params)
 
 	if firstExist {

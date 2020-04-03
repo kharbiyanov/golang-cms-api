@@ -33,3 +33,10 @@ type PostMeta struct {
 	Key       string `gorm:"type:varchar(255)"`
 	Value     string
 }
+
+type MetaQuery struct {
+	Key     string
+	Value   []interface{}
+	Compare string
+	Type    string
+}

@@ -83,6 +83,56 @@ func SetTaxQuery(tx *gorm.DB, params graphql.ResolveParams) (*gorm.DB, error) {
 	return tx, nil
 }
 
+func SetMetaQuery(tx *gorm.DB, params graphql.ResolveParams) (*gorm.DB, error) {
+	if metaQueryParam, ok := params.Args["meta_query"].([]interface{}); ok {
+		var metaQuery []models.MetaQuery
+		if err := mapstructure.Decode(metaQueryParam, &metaQuery); err != nil {
+			return nil, err
+		}
+
+		for i, query := range metaQuery {
+			if len(query.Value) == 0 {
+				continue
+			}
+
+			tName := fmt.Sprintf("pm_%d", i)
+			tx = tx.Joins(fmt.Sprintf("LEFT JOIN post_meta %[1]s ON %[1]s.post_id = posts.id", tName))
+
+			switch query.Compare {
+			case "=", "!=", ">", ">=", "<", "<=", "LIKE", "NOT LIKE":
+				value := query.Value[0]
+
+				if query.Compare == "LIKE" || query.Compare == "NOT LIKE" {
+					value = fmt.Sprintf("%%%v%%", value)
+				}
+
+				switch query.Compare {
+				case "!=", "NOT LIKE":
+					tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value %[2]s ? OR %[1]s.value IS NULL", tName, query.Compare), query.Key, value)
+				default:
+					tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value %[2]s ?", tName, query.Compare), query.Key, value)
+				}
+			case "NOT IN":
+				var value interface{}
+				if len(query.Value) == 1 {
+					value = query.Value[0]
+				} else {
+					value = query.Value
+				}
+				tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value NOT IN (?) OR %[1]s.value IS NULL", tName), query.Key, value)
+			default:
+				if len(query.Value) == 1 {
+					tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value = ?", tName), query.Key, query.Value[0])
+				} else {
+					tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value IN (?)", tName), query.Key, query.Value)
+				}
+			}
+		}
+	}
+
+	return tx, nil
+}
+
 func getTermIDs(query models.TaxQuery) ([]int, error) {
 	taxonomy := "category"
 	field := "id"

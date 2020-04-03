@@ -68,6 +68,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"tax_query": &graphql.ArgumentConfig{
 				Type: scalars.JSON,
 			},
+			"meta_query": &graphql.ArgumentConfig{
+				Type: scalars.JSON,
+			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return GetPosts(params, postConfig)
