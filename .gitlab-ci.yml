@@ -31,9 +31,6 @@ build:
     paths:
       - main
       - plugins
-  only:
-    - test
-    - master
 
 deploy_test:
   stage: deploy_test
@@ -43,7 +40,7 @@ deploy_test:
     name: test
     url: https://cms.ux.uz/test/api/graphql/
   only:
-    - test2
+    - test
 
 deploy_prod:
   stage: deploy_prod
@@ -51,6 +48,6 @@ deploy_prod:
     - echo "Deploy to production server"
   environment:
     name: production
-    url: https://cms.ux.uz/test/api/graphql/
+    url: https://cms.ux.uz/prod/api/graphql/
   only:
-    - master2
+    - master
