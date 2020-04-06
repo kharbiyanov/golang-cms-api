@@ -19,8 +19,8 @@ before_script:
 
 stages:
   - build
-  - deploy_test
-  - deploy_prod
+  - test
+  - production
 
 build:
   extends: .go-cache
@@ -31,9 +31,14 @@ build:
     paths:
       - main
       - plugins
+  only:
+    - branches
+  except:
+    - test
+    - master
 
-deploy_test:
-  stage: deploy_test
+test:
+  stage: test
   script:
     - echo "Deploy to test server"
   environment:
@@ -44,8 +49,8 @@ deploy_test:
   except:
     - test
 
-deploy_prod:
-  stage: deploy_prod
+production:
+  stage: deploy
   script:
     - echo "Deploy to production server"
   environment:
