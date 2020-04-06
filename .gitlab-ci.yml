@@ -17,10 +17,6 @@ before_script:
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
 
-stages:
-  - build
-  - deploy
-
 build:
   extends: .go-cache
   stage: build
@@ -34,7 +30,6 @@ build:
     - master
 
 test:
-  stage: deploy
   script:
     - echo "Deploy to test server"
   environment:
@@ -44,7 +39,6 @@ test:
     - master
 
 production:
-  stage: deploy
   script:
     - echo "Deploy to production server"
   environment:
