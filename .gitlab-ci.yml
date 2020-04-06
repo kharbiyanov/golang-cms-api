@@ -1,8 +1,6 @@
-# This file is a template, and might need editing before it works on your project.
 image: golang:latest
 
 variables:
-  # Please edit to your GitLab project
   REPO_NAME: git.osg.uz/cms/development/api
 
 .go-cache:
@@ -14,12 +12,6 @@ variables:
     paths:
       - .go/pkg/mod/
 
-# The problem is that to be able to use go get, one needs to put
-# the repository in the $GOPATH. So for example if your gitlab domain
-# is gitlab.com, and that your repository is namespace/project, and
-# the default GOPATH being /go, then you'd need to have your
-# repository in /go/src/gitlab.com/namespace/project
-# Thus, making a symbolic link corrects this.
 before_script:
   - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
@@ -27,9 +19,10 @@ before_script:
 
 stages:
   - build
-  - deploy
+  - deploy_test
+  - deploy_prod
 
-compile:
+build:
   extends: .go-cache
   stage: build
   script:
@@ -38,3 +31,26 @@ compile:
     paths:
       - main
       - plugins
+  only:
+    - test
+    - master
+
+deploy_test:
+  stage: deploy_test
+  script:
+    - echo "Deploy to test server"
+  environment:
+    name: test
+    url: https://cms.ux.uz/test/api/graphql/
+  only:
+    - test
+
+deploy_prod:
+  stage: deploy_test
+  script:
+    - echo "Deploy to test server"
+  environment:
+    name: test
+    url: https://cms.ux.uz/test/api/graphql/
+  only:
+    - master
