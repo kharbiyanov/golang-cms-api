@@ -24,7 +24,7 @@ stages:
 
 build:
   extends: .go-cache
-  stage: build
+  stage: Build
   script:
     - sh run-build.sh
   artifacts:
@@ -36,7 +36,7 @@ build:
     - master
 
 deploy_test:
-  stage: deploy_test
+  stage: Deploy to Test
   script:
     - echo "Deploy to test server"
   environment:
@@ -46,11 +46,11 @@ deploy_test:
     - test
 
 deploy_prod:
-  stage: deploy_test
+  stage: Deploy to Production
   script:
-    - echo "Deploy to test server"
+    - echo "Deploy to production server"
   environment:
-    name: test
+    name: production
     url: https://cms.ux.uz/test/api/graphql/
   only:
     - master
