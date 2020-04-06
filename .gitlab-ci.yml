@@ -43,7 +43,7 @@ deploy_test:
     name: test
     url: https://cms.ux.uz/test/api/graphql/
   only:
-    - test
+    - test2
 
 deploy_prod:
   stage: deploy_prod
@@ -53,4 +53,4 @@ deploy_prod:
     name: production
     url: https://cms.ux.uz/test/api/graphql/
   only:
-    - master
+    - master2
