@@ -31,8 +31,6 @@ build:
       - main
       - plugins
   only:
-    - branches
-  except:
     - test
     - master
 
