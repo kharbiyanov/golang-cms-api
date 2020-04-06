@@ -30,6 +30,7 @@ stages:
   - deploy
 
 compile:
+  extends: .go-cache
   stage: build
   script:
     - sh run-build.sh
