@@ -4,6 +4,10 @@ image: golang:latest
 variables:
   # Please edit to your GitLab project
   REPO_NAME: git.osg.uz/cms/development/api
+  
+cache:
+  paths:
+    - $GOPATH/pkg/mod
 
 # The problem is that to be able to use go get, one needs to put
 # the repository in the $GOPATH. So for example if your gitlab domain
@@ -23,7 +27,7 @@ stages:
 compile:
   stage: build
   script:
-    - sh run-build.sh -o $CI_PROJECT_DIR/mybinary
+    - sh run-build.sh
   artifacts:
     paths:
       - main
