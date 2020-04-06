@@ -4,11 +4,15 @@ image: golang:latest
 variables:
   # Please edit to your GitLab project
   REPO_NAME: git.osg.uz/cms/development/api
-  
-cache:
-  key: gomod-cache-{{ checksum "go.sum" }}
-  paths:
-    - /go/pkg/mod
+
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    paths:
+      - .go/pkg/mod/
 
 # The problem is that to be able to use go get, one needs to put
 # the repository in the $GOPATH. So for example if your gitlab domain
