@@ -18,13 +18,13 @@ before_script:
   - cd $GOPATH/src/$REPO_NAME
 
 stages:
-  - Build
-  - Deploy to Test
-  - Deploy to Prod
+  - build
+  - deploy_test
+  - deploy_prod
 
 build:
   extends: .go-cache
-  stage: Build
+  stage: build
   script:
     - sh run-build.sh
   artifacts:
@@ -36,7 +36,7 @@ build:
     - master
 
 deploy_test:
-  stage: Deploy to Test
+  stage: deploy_test
   script:
     - echo "Deploy to test server"
   environment:
@@ -46,7 +46,7 @@ deploy_test:
     - test
 
 deploy_prod:
-  stage: Deploy to Prod
+  stage: deploy_prod
   script:
     - echo "Deploy to production server"
   environment:
