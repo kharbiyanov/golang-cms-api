@@ -1,0 +1,55 @@
+image: golang:latest
+
+variables:
+  REPO_NAME: git.osg.uz/cms/development/api
+
+.go-cache:
+  variables:
+    GOPATH: $CI_PROJECT_DIR/.go
+  before_script:
+    - mkdir -p .go
+  cache:
+    paths:
+      - .go/pkg/mod/
+
+before_script:
+  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
+  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
+  - cd $GOPATH/src/$REPO_NAME
+
+stages:
+  - build
+  - deploy
+
+build:
+  extends: .go-cache
+  stage: build
+  script:
+    - sh run-build.sh
+  artifacts:
+    paths:
+      - main
+      - plugins
+  only:
+    - master
+
+test:
+  stage: deploy
+  script:
+    - echo "Deploy to test server"
+  environment:
+    name: test
+    url: https://cms.ux.uz/test/api/graphql/
+  only:
+    - master
+
+production:
+  stage: deploy
+  script:
+    - echo "Deploy to production server"
+  environment:
+    name: production
+    url: https://cms.ux.uz/prod/api/graphql/
+  when: manual
+  only:
+    - master
