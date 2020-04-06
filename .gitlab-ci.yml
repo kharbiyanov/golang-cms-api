@@ -31,7 +31,6 @@ build:
       - main
       - plugins
   only:
-    - test
     - master
 
 test:
@@ -42,7 +41,7 @@ test:
     name: test
     url: https://cms.ux.uz/test/api/graphql/
   only:
-    - test
+    - master
 
 production:
   stage: deploy
@@ -51,5 +50,6 @@ production:
   environment:
     name: production
     url: https://cms.ux.uz/prod/api/graphql/
+  when: manual
   only:
     - master
