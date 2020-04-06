@@ -6,8 +6,9 @@ variables:
   REPO_NAME: git.osg.uz/cms/development/api
   
 cache:
+  key: gomod-cache-{{ checksum "go.sum" }}
   paths:
-    - $GOPATH/pkg/mod
+    - /go/pkg/mod
 
 # The problem is that to be able to use go get, one needs to put
 # the repository in the $GOPATH. So for example if your gitlab domain
