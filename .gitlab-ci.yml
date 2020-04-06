@@ -40,6 +40,8 @@ deploy_test:
     name: test
     url: https://cms.ux.uz/test/api/graphql/
   only:
+    - branches
+  except:
     - test
 
 deploy_prod:
@@ -50,4 +52,6 @@ deploy_prod:
     name: production
     url: https://cms.ux.uz/prod/api/graphql/
   only:
+    - branches
+  except:
     - master
