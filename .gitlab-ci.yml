@@ -18,9 +18,9 @@ before_script:
   - cd $GOPATH/src/$REPO_NAME
 
 stages:
-  - build
-  - deploy_test
-  - deploy_prod
+  - Build
+  - Deploy to Test
+  - Deploy to Prod
 
 build:
   extends: .go-cache
@@ -36,7 +36,7 @@ build:
     - master
 
 deploy_test:
-  stage: "Deploy to Test"
+  stage: Deploy to Test
   script:
     - echo "Deploy to test server"
   environment:
@@ -46,7 +46,7 @@ deploy_test:
     - test
 
 deploy_prod:
-  stage: "Deploy to Production"
+  stage: Deploy to Prod
   script:
     - echo "Deploy to production server"
   environment:
