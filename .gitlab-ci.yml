@@ -1,56 +1,47 @@
 image: golang:latest
 
-variables:
-  REPO_NAME: git.osg.uz/cms/development/api
-
-.go-cache:
-  variables:
-    GOPATH: $CI_PROJECT_DIR/.go
-  before_script:
-    - mkdir -p .go
-  cache:
-    paths:
-      - .go/pkg/mod/
-
-before_script:
-  - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
-  - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
-  - cd $GOPATH/src/$REPO_NAME
-
 stages:
-  - build
   - test
-  - production
+  - build
+  - deploy
+
+test:
+  stage: test
+  script: echo "Running tests"
 
 build:
-  extends: .go-cache
   stage: build
-  script:
-    - sh run-build.sh
-  artifacts:
-    paths:
-      - main
-      - plugins
-  only:
-    - master
+  script: echo "Building the app"
 
-deploy to test:
-  stage: test
+deploy_review:
+  stage: deploy
   script:
-    - echo "Deploy to test server"
+    - echo "Deploy a review app"
   environment:
-    name: test
-    url: https://cms.ux.uz/test/api/graphql/
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.example.com
+  only:
+    - branches
+  except:
+    - master
+
+deploy_staging:
+  stage: deploy
+  script:
+    - echo "Deploy to staging server"
+  environment:
+    name: staging
+    url: https://staging.example.com
   only:
     - master
 
-deploy to production:
-  stage: production
+deploy_prod:
+  stage: deploy
   script:
     - echo "Deploy to production server"
   environment:
     name: production
-    url: https://cms.ux.uz/prod/api/graphql/
+    url: https://example.com
   when: manual
   only:
     - master
