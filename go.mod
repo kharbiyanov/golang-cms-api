@@ -11,8 +11,9 @@ require (
 	github.com/graphql-go/graphql v0.7.9
 	github.com/graphql-go/handler v0.2.3
 	github.com/jinzhu/gorm v1.9.12
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/satori/go.uuid v1.2.0
 	github.com/spf13/viper v1.6.2
-	github.com/t-tiger/gorm-bulk-insert v1.3.0 // indirect
+	github.com/t-tiger/gorm-bulk-insert v1.3.0
 	golang.org/x/crypto v0.0.0-20200323165209-0ec3e9974c59
 )

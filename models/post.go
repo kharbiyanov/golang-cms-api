@@ -38,5 +38,4 @@ type MetaQuery struct {
 	Key     string
 	Value   []interface{}
 	Compare string
-	Type    string
 }

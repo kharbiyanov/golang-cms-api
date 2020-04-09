@@ -120,6 +120,11 @@ func SetMetaQuery(tx *gorm.DB, params graphql.ResolveParams) (*gorm.DB, error) {
 					value = query.Value
 				}
 				tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value NOT IN (?) OR %[1]s.value IS NULL", tName), query.Key, value)
+			case "BETWEEN", "NOT BETWEEN":
+				if len(query.Value) < 2 {
+					continue
+				}
+				tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value %[2]s ? AND ?", tName, query.Compare), query.Key, query.Value[0], query.Value[1])
 			default:
 				if len(query.Value) == 1 {
 					tx = tx.Where(fmt.Sprintf("%[1]s.key = ? AND %[1]s.value = ?", tName), query.Key, query.Value[0])

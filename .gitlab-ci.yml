@@ -13,6 +13,8 @@ variables:
       - .go/pkg/mod/
 
 before_script:
+  - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y  )"
+  - eval $(ssh-agent -s)
   - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
@@ -20,37 +22,35 @@ before_script:
 stages:
   - build
   - test
-  - production
 
 build:
   extends: .go-cache
   stage: build
-  script:
-    - sh run-build.sh
   artifacts:
     paths:
       - main
       - plugins
   only:
     - master
+  script:
+    - sh run-build.sh
 
 deploy to test:
   stage: test
-  script:
-    - echo "Deploy to test server"
   environment:
     name: test
     url: https://cms.ux.uz/test/api/graphql/
   only:
     - master
-
-deploy to production:
-  stage: production
   script:
-    - echo "Deploy to production server"
-  environment:
-    name: production
-    url: https://cms.ux.uz/prod/api/graphql/
-  when: manual
-  only:
-    - master
+    - echo "Deploy to test server"
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan $SSH_HOST >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - ssh -T $SSH_USER@$SSH_HOST sh /home/cms/docker/cms.ux.uz/test/api/stop.sh
+    - scp main $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
+    - scp plugins $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
+    - scp rbac_model.conf $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
+    - ssh -T $SSH_USER@$SSH_HOST sh /home/cms/docker/cms.ux.uz/test/api/start.sh
