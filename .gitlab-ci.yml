@@ -51,6 +51,6 @@ deploy to test:
     - chmod 644 ~/.ssh/known_hosts
     - ssh -T $SSH_USER@$SSH_HOST sh /home/cms/docker/cms.ux.uz/test/api/stop.sh
     - scp main $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
-    - scp plugins $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
+    - scp -r plugins $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
     - scp rbac_model.conf $SSH_USER@$SSH_HOST:/home/cms/docker/cms.ux.uz/test/api
     - ssh -T $SSH_USER@$SSH_HOST sh /home/cms/docker/cms.ux.uz/test/api/start.sh
