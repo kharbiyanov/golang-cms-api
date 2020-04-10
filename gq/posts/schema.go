@@ -71,6 +71,15 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"meta_query": &graphql.ArgumentConfig{
 				Type: scalars.JSON,
 			},
+			"search": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"exact": &graphql.ArgumentConfig{
+				Type: graphql.Boolean,
+			},
+			"sentence": &graphql.ArgumentConfig{
+				Type: graphql.Boolean,
+			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return GetPosts(params, postConfig)
