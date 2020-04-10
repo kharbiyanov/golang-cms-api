@@ -8,7 +8,40 @@ import (
 	"github.com/jinzhu/gorm"
 	"github.com/mitchellh/mapstructure"
 	"log"
+	"strings"
 )
+
+func SetSearch(tx *gorm.DB, params graphql.ResolveParams) *gorm.DB {
+	if pSearch, ok := params.Args["search"].(string); ok {
+		exact := false
+		sentence := false
+		if pExact, ok := params.Args["exact"].(bool); ok {
+			exact = pExact
+		}
+		if pSentence, ok := params.Args["sentence"].(bool); ok {
+			sentence = pSentence
+		}
+
+		query := "posts.title LIKE ? OR posts.content LIKE ? OR posts.excerpt LIKE ?"
+
+		if !sentence {
+			searchArray := strings.Split(pSearch, " ")
+			for _, search := range searchArray {
+				if exact {
+					search = fmt.Sprintf("%%%s%%", search)
+				}
+				tx = tx.Where(query, search, search, search)
+			}
+		} else {
+			if exact {
+				pSearch = fmt.Sprintf("%%%s%%", pSearch)
+			}
+			tx = tx.Where(query, pSearch, pSearch, pSearch)
+		}
+	}
+
+	return tx
+}
 
 func SetOrder(tx *gorm.DB, params graphql.ResolveParams) *gorm.DB {
 	pOrderBy, pOrderByExist := params.Args["order_by"].(string)

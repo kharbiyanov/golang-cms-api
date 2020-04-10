@@ -33,6 +33,8 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 		Joins("LEFT JOIN translations t ON t.element_id = posts.id").
 		Where("posts.type = ? AND t.lang = ? AND t.element_type = ?", postConfig.Slug, lang, fmt.Sprintf("post_%s", postConfig.Slug))
 
+	tx = SetSearch(tx, params)
+
 	tx, taxErr := SetTaxQuery(tx, params)
 
 	if taxErr != nil {
