@@ -80,6 +80,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"sentence": &graphql.ArgumentConfig{
 				Type: graphql.Boolean,
 			},
+			"date_query": &graphql.ArgumentConfig{
+				Type: scalars.JSON,
+			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return GetPosts(params, postConfig)

@@ -31,6 +31,12 @@ func GetPostType(postConfig models.PostConfig) *graphql.Object {
 				"id": &graphql.Field{
 					Type: graphql.Int,
 				},
+				"created_at": &graphql.Field{
+					Type: graphql.NewNonNull(graphql.String),
+				},
+				"updated_at": &graphql.Field{
+					Type: graphql.NewNonNull(graphql.String),
+				},
 				"title": &graphql.Field{
 					Type: graphql.NewNonNull(graphql.String),
 				},
