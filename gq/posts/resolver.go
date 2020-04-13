@@ -1,7 +1,6 @@
 package main
 
 import (
-	"cms-api/config"
 	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
@@ -22,48 +21,17 @@ func GetPost(params graphql.ResolveParams, postConfig models.PostConfig) (interf
 }
 
 func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
-	lang, _ := params.Args["lang"].(string)
-	first, firstExist := params.Args["first"].(int)
-	offset, offsetExist := params.Args["offset"].(int)
-
-	var posts []models.Post
-
-	tx := utils.DB.Table("posts").
-		Select("posts.*").
-		Joins("LEFT JOIN translations t ON t.element_id = posts.id").
-		Where("posts.type = ? AND t.lang = ? AND t.element_type = ?", postConfig.Slug, lang, fmt.Sprintf("post_%s", postConfig.Slug))
-
-	tx = SetSearch(tx, params)
-
-	tx, taxErr := SetTaxQuery(tx, params)
-
-	if taxErr != nil {
-		return nil, taxErr
+	var query = PostQuery{
+		tx:         utils.DB,
+		params:     params,
+		postConfig: postConfig,
 	}
 
-	tx, metaErr := SetMetaQuery(tx, params)
-
-	if metaErr != nil {
-		return nil, metaErr
-	}
-
-	tx = SetOrder(tx, params)
-
-	if firstExist {
-		tx = tx.Limit(first)
-	} else {
-		tx = tx.Limit(config.Get().DefaultPostsLimit)
-	}
-	if offsetExist {
-		tx = tx.Offset(offset)
-	}
-
-	tx = tx.Group("posts.id")
-
-	if err := tx.Find(&posts).Error; err != nil {
+	if err := query.init(); err != nil {
 		return nil, err
 	}
-	return posts, nil
+
+	return query.posts, nil
 }
 
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
