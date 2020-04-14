@@ -16,7 +16,10 @@ type PostQuery struct {
 	tx         *gorm.DB
 	params     graphql.ResolveParams
 	postConfig models.PostConfig
-	posts      []models.Post
+	results    struct {
+		Data  []models.Post `json:"data"`
+		Count int           `json:"count"`
+	}
 }
 
 func (query *PostQuery) init() error {
@@ -25,7 +28,6 @@ func (query *PostQuery) init() error {
 	query.setSearch()
 	query.setStatus()
 	query.setOrder()
-	query.setLimit()
 	query.setGroup()
 
 	if err := query.setTaxQuery(); err != nil {
@@ -40,7 +42,13 @@ func (query *PostQuery) init() error {
 		return err
 	}
 
-	if err := query.tx.Find(&query.posts).Error; err != nil {
+	if err := query.tx.Count(&query.results.Count).Error; err != nil {
+		return err
+	}
+
+	query.setLimit()
+
+	if err := query.tx.Find(&query.results.Data).Error; err != nil {
 		return err
 	}
 

@@ -42,7 +42,17 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 	}
 
 	queryFields[fmt.Sprintf("%sList", postConfig.Slug)] = &graphql.Field{
-		Type:        graphql.NewList(postType),
+		Type: graphql.NewObject(graphql.ObjectConfig{
+			Name: fmt.Sprintf("%sList", postConfig.Slug),
+			Fields: graphql.Fields{
+				"data": &graphql.Field{
+					Type: graphql.NewList(postType),
+				},
+				"count": &graphql.Field{
+					Type: graphql.Int,
+				},
+			},
+		}),
 		Description: fmt.Sprintf("Get %s list.", postConfig.Slug),
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
