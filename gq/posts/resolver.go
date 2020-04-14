@@ -31,7 +31,7 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 		return nil, err
 	}
 
-	return query.posts, nil
+	return query.results, nil
 }
 
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
