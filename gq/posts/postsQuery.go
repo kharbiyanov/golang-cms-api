@@ -23,6 +23,7 @@ func (query *PostQuery) init() error {
 
 	query.setTables()
 	query.setSearch()
+	query.setStatus()
 	query.setOrder()
 	query.setLimit()
 	query.setGroup()
@@ -115,6 +116,21 @@ func (query *PostQuery) setOrder() {
 	}
 
 	query.tx = query.tx.Order(fmt.Sprintf("%s %s", orderBy, order))
+}
+
+func (query *PostQuery) setStatus() {
+	status := "publish"
+	if pStatus, ok := query.params.Args["status"].(string); ok {
+		switch pStatus {
+		case "publish", "draft", "pending", "trash", "any":
+			status = pStatus
+		}
+	}
+	if status == "any" {
+		query.tx = query.tx.Where("posts.status <> ?", "trash")
+	} else {
+		query.tx = query.tx.Where("posts.status = ?", status)
+	}
 }
 
 func (query *PostQuery) setTaxQuery() error {

@@ -37,7 +37,7 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
 	post := &models.Post{
 		Title:  params.Args["title"].(string),
-		Status: params.Args["status"].(int),
+		Status: params.Args["status"].(string),
 		Slug:   params.Args["slug"].(string),
 		Type:   postConfig.Slug,
 	}

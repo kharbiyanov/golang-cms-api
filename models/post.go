@@ -18,7 +18,7 @@ type Post struct {
 	Title     string     `gorm:"not null"`
 	Content   string
 	Excerpt   string
-	Status    int    `gorm:"not null"`
+	Status    string `gorm:"not null; type:varchar(50)"`
 	Slug      string `gorm:"not null; type:varchar(255); unique;"`
 	Type      string `gorm:"type:varchar(50)"`
 	Meta      []PostMeta

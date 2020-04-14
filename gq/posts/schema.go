@@ -48,6 +48,10 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"lang": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"status": &graphql.ArgumentConfig{
+				Type:         graphql.String,
+				DefaultValue: "publish",
+			},
 			"first": &graphql.ArgumentConfig{
 				Type:         graphql.Int,
 				DefaultValue: config.Get().DefaultPostsLimit,
@@ -108,7 +112,7 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 				Type: graphql.String,
 			},
 			"status": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.Int),
+				Type: graphql.NewNonNull(graphql.String),
 			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
