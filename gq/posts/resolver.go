@@ -146,6 +146,29 @@ func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
 	return post.Meta, nil
 }
 
+func GetTermsInPost(params graphql.ResolveParams) (interface{}, error) {
+	taxonomies, taxonomiesExist := params.Args["taxonomies"].([]interface{})
+	post, postExist := params.Source.(models.Post)
+
+	if !postExist {
+		return nil, nil
+	}
+
+	tx := utils.DB
+
+	if taxonomiesExist {
+		tx = tx.Where("terms.taxonomy in(?)", taxonomies)
+	}
+
+	tx = tx.Table("terms").Select("terms.*").Joins("LEFT JOIN term_relationships r ON terms.id = r.term_id").Where("r.post_id = ?", post.ID)
+
+	if err := tx.Find(&post.Terms).Error; err != nil {
+		return nil, err
+	}
+
+	return post.Terms, nil
+}
+
 func GetMeta(params graphql.ResolveParams) (interface{}, error) {
 	postId, _ := params.Args["post_id"].(int)
 	keys, keysExist := params.Args["keys"].([]interface{})

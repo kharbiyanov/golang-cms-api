@@ -22,6 +22,7 @@ type Post struct {
 	Slug      string `gorm:"not null; type:varchar(255); unique;"`
 	Type      string `gorm:"type:varchar(50)"`
 	Meta      []PostMeta
+	Terms     []Term
 }
 
 type PostMeta struct {
