@@ -40,5 +40,7 @@ func init() {
 		&models.TermRelationship{},
 		&models.Lang{},
 		&models.Translation{},
+		&models.Menu{},
+		&models.MenuItem{},
 	)
 }
