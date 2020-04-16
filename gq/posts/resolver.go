@@ -35,9 +35,18 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 }
 
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
+	status := "publish"
+
+	if pStatus, ok := params.Args["status"].(string); ok {
+		switch pStatus {
+		case "publish", "draft", "pending":
+			status = pStatus
+		}
+	}
+
 	post := &models.Post{
 		Title:  params.Args["title"].(string),
-		Status: params.Args["status"].(string),
+		Status: status,
 		Slug:   params.Args["slug"].(string),
 		Type:   postConfig.Slug,
 	}
@@ -92,7 +101,10 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 		fields["excerpt"] = excerpt
 	}
 	if status, ok := params.Args["status"].(string); ok {
-		fields["status"] = status
+		switch status {
+		case "publish", "draft", "pending", "trash":
+			fields["status"] = status
+		}
 	}
 	if slug, ok := params.Args["slug"].(string); ok {
 		fields["slug"] = slug

@@ -122,7 +122,8 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 				Type: graphql.String,
 			},
 			"status": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
+				Type:         graphql.String,
+				DefaultValue: "publish",
 			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -154,7 +155,7 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 				Type: graphql.String,
 			},
 			"status": &graphql.ArgumentConfig{
-				Type: graphql.Int,
+				Type: graphql.String,
 			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.String,
