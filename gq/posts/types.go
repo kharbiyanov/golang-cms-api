@@ -23,6 +23,38 @@ var MetaType = graphql.NewObject(
 	},
 )
 
+var TermType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "TermType",
+		Fields: graphql.Fields{
+			"id": &graphql.Field{
+				Type: graphql.Int,
+			},
+			"created_at": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"updated_at": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"name": &graphql.Field{
+				Type: graphql.String,
+			},
+			"taxonomy": &graphql.Field{
+				Type: graphql.String,
+			},
+			"description": &graphql.Field{
+				Type: graphql.String,
+			},
+			"slug": &graphql.Field{
+				Type: graphql.String,
+			},
+			"parent": &graphql.Field{
+				Type: graphql.Int,
+			},
+		},
+	},
+)
+
 func GetPostType(postConfig models.PostConfig) *graphql.Object {
 	return graphql.NewObject(
 		graphql.ObjectConfig{
@@ -61,6 +93,17 @@ func GetPostType(postConfig models.PostConfig) *graphql.Object {
 					},
 					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 						return GetMetaInPost(params)
+					},
+				},
+				"terms": &graphql.Field{
+					Type: graphql.NewList(TermType),
+					Args: graphql.FieldConfigArgument{
+						"taxonomies": &graphql.ArgumentConfig{
+							Type: graphql.NewList(graphql.String),
+						},
+					},
+					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+						return GetTermsInPost(params)
 					},
 				},
 			},
