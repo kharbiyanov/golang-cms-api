@@ -31,6 +31,19 @@ func CreateMenu(params graphql.ResolveParams) (interface{}, error) {
 	return menu, nil
 }
 
+func UpdateMenu(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	name, _ := params.Args["name"].(string)
+
+	var menu models.Menu
+
+	if err := utils.DB.Model(&menu).Where("id = ?", id).Update("name", name).Find(&menu).Error; err != nil {
+		return nil, err
+	}
+
+	return menu, nil
+}
+
 func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 	menuID, _ := params.Args["menu_id"].(int)
 	itemType, _ := params.Args["type"].(string)
@@ -73,6 +86,57 @@ func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 	}
 
 	if err := utils.DB.Create(&menuItem).Scan(&menuItem).Error; err != nil {
+		return nil, err
+	}
+
+	return menuItem, nil
+}
+
+func UpdateMenuItem(params graphql.ResolveParams) (interface{}, error) {
+	menuID, _ := params.Args["menu_id"].(int)
+	fields := make(map[string]interface{})
+
+	var menuItem = models.MenuItem{
+		ID: menuID,
+	}
+
+	if title, ok := params.Args["title"].(string); ok {
+		fields["title"] = title
+	}
+
+	if itemType, ok := params.Args["type"].(string); ok {
+		fields["type"] = itemType
+	}
+
+	if object, ok := params.Args["object"].(string); ok {
+		fields["object"] = object
+	}
+
+	if objectID, ok := params.Args["object_id"].(int); ok {
+		fields["object_id"] = objectID
+	}
+
+	if url, ok := params.Args["url"].(string); ok {
+		fields["url"] = url
+	}
+
+	if parent, ok := params.Args["parent"].(int); ok {
+		fields["parent"] = parent
+	}
+
+	if order, ok := params.Args["order"].(int); ok {
+		fields["order"] = order
+	}
+
+	if target, ok := params.Args["target"].(string); ok {
+		fields["target"] = target
+	}
+
+	if classes, ok := params.Args["classes"].(string); ok {
+		fields["classes"] = classes
+	}
+
+	if err := utils.DB.Model(&menuItem).Updates(fields).Scan(&menuItem).Error; err != nil {
 		return nil, err
 	}
 
