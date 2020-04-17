@@ -3,6 +3,7 @@ package main
 import (
 	"cms-api/models"
 	"cms-api/utils"
+	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
@@ -76,4 +77,72 @@ func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 	}
 
 	return menuItem, nil
+}
+
+func GetMenuList() (interface{}, error) {
+	var menuList []models.Menu
+
+	if err := utils.DB.Find(&menuList).Error; err != nil {
+		return nil, err
+	}
+	return menuList, nil
+}
+
+func GetMenuItemList(params graphql.ResolveParams) (interface{}, error) {
+	menuID, _ := params.Args["menu_id"].(int)
+
+	var items []models.MenuItem
+
+	rows, err := utils.DB.Table("menu_items i").
+		Select("i.id, i.created_at, i.updated_at, i.menu_id, i.author_id, i.title, i.type, i.object, i.object_id, i.url, i.parent, i.order, i.target, i.classes").
+		Where("i.deleted_at IS NULL AND i.menu_id = ?", menuID).
+		Rows()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var item models.MenuItem
+
+		if err := rows.Scan(
+			&item.ID,
+			&item.CreatedAt,
+			&item.UpdatedAt,
+			&item.MenuID,
+			&item.AuthorID,
+			&item.Title,
+			&item.Type,
+			&item.Object,
+			&item.ObjectID,
+			&item.Url,
+			&item.Parent,
+			&item.Order,
+			&item.Target,
+			&item.Classes,
+		); err != nil {
+			return nil, err
+		}
+		if item.Object != "" && item.ObjectID > 0 {
+			switch item.Type {
+			case "post":
+				var post = models.Post{}
+				post.ID = item.ObjectID
+
+				if err := utils.DB.Where(&models.Post{Type: item.Object}).First(&post).Error; err == nil {
+					item.Url = fmt.Sprintf("http://%s", post.Slug)
+				}
+			case "taxonomy":
+				var term = models.Term{}
+				term.ID = item.ObjectID
+
+				if err := utils.DB.Where(&models.Term{Taxonomy: item.Object}).First(&term).Error; err == nil {
+					item.Url = fmt.Sprintf("http://%s", term.Slug)
+				}
+			}
+		}
+		items = append(items, item)
+	}
+
+	return items, nil
 }

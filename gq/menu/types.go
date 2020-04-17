@@ -20,9 +20,6 @@ var MenuType = graphql.NewObject(
 			"name": &graphql.Field{
 				Type: graphql.String,
 			},
-			"items": &graphql.Field{
-				Type: graphql.NewList(MenuItemType),
-			},
 		},
 	},
 )
@@ -48,6 +45,9 @@ var MenuItemType = graphql.NewObject(
 			},
 			"object": &graphql.Field{
 				Type: graphql.String,
+			},
+			"object_id": &graphql.Field{
+				Type: graphql.Int,
 			},
 			"url": &graphql.Field{
 				Type: graphql.String,

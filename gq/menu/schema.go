@@ -20,6 +20,25 @@ func InitSchema(plugin *models.Plugin) {
 }
 
 func setupQuery() {
+	queryFields["menuList"] = &graphql.Field{
+		Type:        graphql.NewList(MenuType),
+		Description: "Get menu list.",
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return GetMenuList()
+		},
+	}
+	queryFields["menuItemList"] = &graphql.Field{
+		Type:        graphql.NewList(MenuItemType),
+		Description: "Get menu item list.",
+		Args: graphql.FieldConfigArgument{
+			"menu_id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return GetMenuItemList(params)
+		},
+	}
 }
 
 func setupMutation() {
