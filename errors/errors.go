@@ -18,6 +18,8 @@ const (
 	TermParentIDNotFoundMessage  = "Term Parent ID Not Found"
 	LangCodeExistMessage         = "Lang Code Exist"
 	LangNotFoundMessage          = "Lang Not Found"
+	MenuItemNotFoundMessage      = "Menu Item Not Found"
+	MenuNotFoundMessage          = "Menu Not Found"
 )
 
 type ErrorWithCode struct {

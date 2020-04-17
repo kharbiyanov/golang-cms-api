@@ -61,6 +61,22 @@ func setupMutation() {
 			return CreateMenu(params)
 		},
 	}
+	mutationFields["menuDelete"] = &graphql.Field{
+		Type:        MenuType,
+		Description: "Delete menu.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "menu", "delete"); err != nil {
+				return nil, err
+			}
+
+			return DeleteMenu(params)
+		},
+	}
 	mutationFields["menuItemCreate"] = &graphql.Field{
 		Type:        MenuItemType,
 		Description: "Create new menu item.",
@@ -102,6 +118,22 @@ func setupMutation() {
 			}
 
 			return CreateMenuItem(params)
+		},
+	}
+	mutationFields["menuItemDelete"] = &graphql.Field{
+		Type:        MenuItemType,
+		Description: "Delete menu item.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "menuItem", "delete"); err != nil {
+				return nil, err
+			}
+
+			return DeleteMenuItem(params)
 		},
 	}
 }
