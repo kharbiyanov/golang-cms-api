@@ -60,11 +60,9 @@ func UpdateMenu(params graphql.ResolveParams) (interface{}, error) {
 
 	var menu models.Menu
 
-	if err := utils.DB.Model(&menu).Where("id = ?", id).Update("name", name).Find(&menu).Error; err != nil {
-		return nil, err
-	}
+	err := utils.DB.Model(&menu).Where("id = ?", id).Update("name", name).Find(&menu).Error
 
-	return menu, nil
+	return menu, err
 }
 
 func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
@@ -126,11 +124,7 @@ func DeleteMenuItem(params graphql.ResolveParams) (interface{}, error) {
 		}
 	}
 
-	if err := utils.DB.Delete(menuItem).Error; err != nil {
-		return nil, err
-	}
-
-	return menuItem, nil
+	return menuItem, utils.DB.Delete(menuItem).Error
 }
 
 func UpdateMenuItem(params graphql.ResolveParams) (interface{}, error) {
@@ -177,11 +171,9 @@ func UpdateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 		fields["classes"] = classes
 	}
 
-	if err := utils.DB.Model(&menuItem).Updates(fields).Scan(&menuItem).Error; err != nil {
-		return nil, err
-	}
+	err := utils.DB.Model(&menuItem).Updates(fields).Scan(&menuItem).Error
 
-	return menuItem, nil
+	return menuItem, err
 }
 
 func GetMenuList() (interface{}, error) {
