@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
 	"fmt"
@@ -25,6 +26,28 @@ func CreateMenu(params graphql.ResolveParams) (interface{}, error) {
 	}
 
 	if err := utils.DB.Create(&translation).Scan(&translation).Error; err != nil {
+		return nil, err
+	}
+
+	return menu, nil
+}
+
+func DeleteMenu(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	menu := models.Menu{}
+
+	if utils.DB.First(&menu, id).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.MenuNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
+	}
+
+	if err := utils.DB.Delete(menu).Error; err != nil {
+		return nil, err
+	}
+
+	if err := utils.DB.Delete(&models.MenuItem{}, "menu_id = ?", id).Error; err != nil {
 		return nil, err
 	}
 
@@ -73,6 +96,24 @@ func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 	}
 
 	if err := utils.DB.Create(&menuItem).Scan(&menuItem).Error; err != nil {
+		return nil, err
+	}
+
+	return menuItem, nil
+}
+
+func DeleteMenuItem(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	menuItem := models.MenuItem{}
+
+	if utils.DB.First(&menuItem, id).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.MenuItemNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
+	}
+
+	if err := utils.DB.Delete(menuItem).Error; err != nil {
 		return nil, err
 	}
 
