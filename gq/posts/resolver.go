@@ -14,7 +14,7 @@ func GetPost(params graphql.ResolveParams, postConfig models.PostConfig) (interf
 	var post = models.Post{}
 	post.ID = id
 
-	if err := utils.DB.Where(&models.Post{Type: postConfig.Slug}).First(&post).Error; err != nil {
+	if err := utils.DB.Where(&models.Post{Type: postConfig.Type}).First(&post).Error; err != nil {
 		return nil, err
 	}
 	return post, nil
@@ -48,7 +48,7 @@ func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 		Title:  params.Args["title"].(string),
 		Status: status,
 		Slug:   params.Args["slug"].(string),
-		Type:   postConfig.Slug,
+		Type:   postConfig.Type,
 	}
 
 	if content, ok := params.Args["content"].(string); ok {
@@ -61,7 +61,7 @@ func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 
 	lang, _ := params.Args["lang"].(string)
 
-	if !utils.DB.Where(&models.Post{Slug: post.Slug, Type: postConfig.Slug}).First(&post).RecordNotFound() {
+	if !utils.DB.Where(&models.Post{Slug: post.Slug, Type: postConfig.Type}).First(&post).RecordNotFound() {
 		return nil, &errors.ErrorWithCode{
 			Message: errors.PostSlugExistMessage,
 			Code:    errors.InvalidParamsCode,
@@ -73,7 +73,7 @@ func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	}
 
 	translation := models.Translation{
-		ElementType: fmt.Sprintf("post_%s", postConfig.Slug),
+		ElementType: fmt.Sprintf("post_%s", postConfig.Type),
 		ElementID:   post.ID,
 		Lang:        lang,
 	}
@@ -108,7 +108,7 @@ func UpdatePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	}
 	if slug, ok := params.Args["slug"].(string); ok {
 		fields["slug"] = slug
-		if !utils.DB.Where(&models.Post{Type: postConfig.Slug, Slug: slug}).Not(&models.Post{ID: id}).First(&post).RecordNotFound() {
+		if !utils.DB.Where(&models.Post{Type: postConfig.Type, Slug: slug}).Not(&models.Post{ID: id}).First(&post).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
 				Message: errors.PostSlugExistMessage,
 				Code:    errors.InvalidParamsCode,
@@ -129,7 +129,7 @@ func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 
 	var post = models.Post{}
 	post.ID = id
-	post.Type = postConfig.Slug
+	post.Type = postConfig.Type
 
 	if err := utils.DB.Delete(&post).Error; err != nil {
 		return nil, err

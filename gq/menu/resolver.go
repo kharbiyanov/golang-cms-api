@@ -4,7 +4,6 @@ import (
 	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
-	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
@@ -225,16 +224,22 @@ func GetMenuItemList(params graphql.ResolveParams) (interface{}, error) {
 			case "post":
 				var post = models.Post{}
 				post.ID = item.ObjectID
-
 				if err := utils.DB.Where(&models.Post{Type: item.Object}).First(&post).Error; err == nil {
-					item.Url = fmt.Sprintf("http://%s", post.Slug)
+					url, err := utils.GetPermalink(post)
+					if err != nil {
+						return nil, err
+					}
+					item.Url = url
 				}
 			case "taxonomy":
 				var term = models.Term{}
 				term.ID = item.ObjectID
-
 				if err := utils.DB.Where(&models.Term{Taxonomy: item.Object}).First(&term).Error; err == nil {
-					item.Url = fmt.Sprintf("http://%s", term.Slug)
+					url, err := utils.GetPermalink(term)
+					if err != nil {
+						return nil, err
+					}
+					item.Url = url
 				}
 			}
 		}

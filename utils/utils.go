@@ -1,17 +1,22 @@
 package utils
 
 import (
+	"bytes"
+	"cms-api/config"
 	"cms-api/errors"
+	"cms-api/models"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"golang.org/x/crypto/bcrypt"
 	"strings"
+	"text/template"
 	"time"
 )
 
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+	b, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(b), err
 }
 
 func CheckPasswordHash(password, hash string) bool {
@@ -45,4 +50,48 @@ func GetBearerToken(bearer string) (string, error) {
 	}
 
 	return token[1], nil
+}
+
+func GetPermalink(object interface{}) (string, error) {
+	c := config.Get()
+	tmpl := template.New("Permalink")
+	buf := &bytes.Buffer{}
+	var permalink models.Permalink
+	tmplText := ""
+	switch obj := object.(type) {
+	case models.Post:
+		postConfig := GetPostConfig(obj.Type)
+		permalink = models.Permalink{
+			Id:     obj.ID,
+			Object: obj.Type,
+			Slug:   obj.Slug,
+		}
+		tmplText = postConfig.SingleUrl
+	case models.Term:
+		permalink = models.Permalink{
+			Id:     obj.ID,
+			Object: obj.Taxonomy,
+			Slug:   obj.Slug,
+		}
+		tmplText = "/{{.Object}}/{{.Slug}}/"
+	}
+	if _, err := tmpl.Parse(tmplText); err != nil {
+		return "", err
+	}
+	if err := tmpl.Execute(buf, permalink); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s%s", c.SiteUrl, buf.String()), nil
+}
+
+func GetPostConfig(postType string) models.PostConfig {
+	c := config.Get()
+	var postConfig models.PostConfig
+	for _, conf := range c.PostTypes {
+		if postType == conf.Type {
+			postConfig = conf
+			break
+		}
+	}
+	return postConfig
 }

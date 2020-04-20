@@ -5,8 +5,8 @@ import (
 )
 
 type PostConfig struct {
-	Slug       string `json:"slug"`
-	PluralSlug string `json:"pluralSlug"`
+	Type      string `json:"type"`
+	SingleUrl string `json:"singleUrl"`
 }
 
 type Post struct {

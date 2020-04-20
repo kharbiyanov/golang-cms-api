@@ -28,9 +28,9 @@ func InitSchema(plugin *models.Plugin) {
 }
 
 func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
-	queryFields[fmt.Sprintf("%sGet", postConfig.Slug)] = &graphql.Field{
+	queryFields[fmt.Sprintf("%sGet", postConfig.Type)] = &graphql.Field{
 		Type:        postType,
-		Description: fmt.Sprintf("Get %s by id.", postConfig.Slug),
+		Description: fmt.Sprintf("Get %s by id.", postConfig.Type),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
@@ -41,9 +41,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 		},
 	}
 
-	queryFields[fmt.Sprintf("%sList", postConfig.Slug)] = &graphql.Field{
+	queryFields[fmt.Sprintf("%sList", postConfig.Type)] = &graphql.Field{
 		Type: graphql.NewObject(graphql.ObjectConfig{
-			Name: fmt.Sprintf("%sList", postConfig.Slug),
+			Name: fmt.Sprintf("%sList", postConfig.Type),
 			Fields: graphql.Fields{
 				"data": &graphql.Field{
 					Type: graphql.NewList(postType),
@@ -53,7 +53,7 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 				},
 			},
 		}),
-		Description: fmt.Sprintf("Get %s list.", postConfig.Slug),
+		Description: fmt.Sprintf("Get %s list.", postConfig.Type),
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -105,9 +105,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 }
 
 func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) {
-	mutationFields[fmt.Sprintf("%sCreate", postConfig.Slug)] = &graphql.Field{
+	mutationFields[fmt.Sprintf("%sCreate", postConfig.Type)] = &graphql.Field{
 		Type:        postType,
-		Description: fmt.Sprintf("Create new %s.", postConfig.Slug),
+		Description: fmt.Sprintf("Create new %s.", postConfig.Type),
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -130,7 +130,7 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, postConfig.PluralSlug, "create"); err != nil {
+			if err := utils.ValidateUser(params, postConfig.Type, "create"); err != nil {
 				return nil, err
 			}
 
@@ -138,9 +138,9 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 		},
 	}
 
-	mutationFields[fmt.Sprintf("%sUpdate", postConfig.Slug)] = &graphql.Field{
+	mutationFields[fmt.Sprintf("%sUpdate", postConfig.Type)] = &graphql.Field{
 		Type:        postType,
-		Description: fmt.Sprintf("Update %s by id.", postConfig.Slug),
+		Description: fmt.Sprintf("Update %s by id.", postConfig.Type),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
@@ -162,7 +162,7 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, postConfig.PluralSlug, "update"); err != nil {
+			if err := utils.ValidateUser(params, postConfig.Type, "update"); err != nil {
 				return nil, err
 			}
 
@@ -170,16 +170,16 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 		},
 	}
 
-	mutationFields[fmt.Sprintf("%sDelete", postConfig.Slug)] = &graphql.Field{
+	mutationFields[fmt.Sprintf("%sDelete", postConfig.Type)] = &graphql.Field{
 		Type:        postType,
-		Description: fmt.Sprintf("Delete %s by id.", postConfig.Slug),
+		Description: fmt.Sprintf("Delete %s by id.", postConfig.Type),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, postConfig.PluralSlug, "delete"); err != nil {
+			if err := utils.ValidateUser(params, postConfig.Type, "delete"); err != nil {
 				return nil, err
 			}
 

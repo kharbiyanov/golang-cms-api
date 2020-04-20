@@ -9,6 +9,7 @@ import (
 type config struct {
 	ServerAddr        string              `json:"serverAddr"`
 	RedisAddr         string              `json:"redisAddr"`
+	SiteUrl           string              `json:"siteUrl"`
 	DB                db                  `json:"db"`
 	Debug             bool                `json:"debug"`
 	DefaultPostsLimit int                 `json:"defaultPostsLimit"`
@@ -35,6 +36,7 @@ func init() {
 		log.Panicf("Error reading config file, %s", err)
 	}
 
+	viper.SetDefault("siteUrl", "http://localhost:8080")
 	viper.SetDefault("serverAddr", ":3000")
 	viper.SetDefault("redisAddr", ":6379")
 	viper.SetDefault("debug", false)
