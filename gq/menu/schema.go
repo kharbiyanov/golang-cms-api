@@ -77,6 +77,25 @@ func setupMutation() {
 			return DeleteMenu(params)
 		},
 	}
+	mutationFields["menuUpdate"] = &graphql.Field{
+		Type:        MenuType,
+		Description: "Update menu.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"name": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "menu", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateMenu(params)
+		},
+	}
 	mutationFields["menuItemCreate"] = &graphql.Field{
 		Type:        MenuItemType,
 		Description: "Create new menu item.",
@@ -134,6 +153,49 @@ func setupMutation() {
 			}
 
 			return DeleteMenuItem(params)
+		},
+	}
+	mutationFields["menuItemUpdate"] = &graphql.Field{
+		Type:        MenuItemType,
+		Description: "Update menu item.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"title": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"type": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"object": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"object_id": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"url": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"parent": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"order": &graphql.ArgumentConfig{
+				Type: graphql.Int,
+			},
+			"target": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"classes": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "menuItem", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateMenuItem(params)
 		},
 	}
 }
