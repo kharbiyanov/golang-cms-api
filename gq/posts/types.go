@@ -58,7 +58,7 @@ var TermType = graphql.NewObject(
 func GetPostType(postConfig models.PostConfig) *graphql.Object {
 	return graphql.NewObject(
 		graphql.ObjectConfig{
-			Name: strings.Title(postConfig.Slug),
+			Name: strings.Title(postConfig.Type),
 			Fields: graphql.Fields{
 				"id": &graphql.Field{
 					Type: graphql.Int,

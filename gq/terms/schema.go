@@ -1,8 +1,10 @@
 package main
 
 import (
+	"cms-api/config"
 	"cms-api/models"
 	"cms-api/utils"
+	"fmt"
 	"github.com/graphql-go/graphql"
 )
 
@@ -12,22 +14,23 @@ var (
 )
 
 func InitSchema(plugin *models.Plugin) {
-	setupQuery()
-	setupMutation()
+	for _, taxonomyConfig := range config.Get().Taxonomies {
+		taxonomyType := GetTaxonomyType(taxonomyConfig)
+		setupTaxonomiesQuery(taxonomyType, taxonomyConfig)
+		setupTaxonomiesMutation(taxonomyType, taxonomyConfig)
+	}
+	setupMutations()
 
 	plugin.QueryFields = queryFields
 	plugin.MutationFields = mutationFields
 }
 
-func setupQuery() {
-	queryFields["termGetList"] = &graphql.Field{
-		Type:        graphql.NewList(TermType),
-		Description: "Get term list.",
+func setupTaxonomiesQuery(taxonomyType *graphql.Object, taxonomyConfig models.TaxonomyConfig) {
+	queryFields[fmt.Sprintf("%sList", taxonomyConfig.Taxonomy)] = &graphql.Field{
+		Type:        graphql.NewList(taxonomyType),
+		Description: fmt.Sprintf("Get %s list.", taxonomyConfig.Taxonomy),
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
-			},
-			"taxonomy": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 			"parent": &graphql.ArgumentConfig{
@@ -41,15 +44,15 @@ func setupQuery() {
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			return GetTerms(params)
+			return GetTerms(params, taxonomyConfig)
 		},
 	}
 }
 
-func setupMutation() {
-	mutationFields["termCreate"] = &graphql.Field{
-		Type:        TermType,
-		Description: "Create new lang.",
+func setupTaxonomiesMutation(taxonomyType *graphql.Object, taxonomyConfig models.TaxonomyConfig) {
+	mutationFields[fmt.Sprintf("%sCreate", taxonomyConfig.Taxonomy)] = &graphql.Field{
+		Type:        taxonomyType,
+		Description: fmt.Sprintf("Create new %s.", taxonomyConfig.Taxonomy),
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -57,9 +60,6 @@ func setupMutation() {
 			"name": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"taxonomy": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
-			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
@@ -71,22 +71,19 @@ func setupMutation() {
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, "term", "create"); err != nil {
+			if err := utils.ValidateUser(params, taxonomyConfig.Taxonomy, "create"); err != nil {
 				return nil, err
 			}
 
-			return CreateTerm(params)
+			return CreateTerm(params, taxonomyConfig)
 		},
 	}
-	mutationFields["termUpdate"] = &graphql.Field{
-		Type:        TermType,
-		Description: "Update term by id.",
+	mutationFields[fmt.Sprintf("%sUpdate", taxonomyConfig.Taxonomy)] = &graphql.Field{
+		Type:        taxonomyType,
+		Description: fmt.Sprintf("Update %s by id.", taxonomyConfig.Taxonomy),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
-			},
-			"taxonomy": &graphql.ArgumentConfig{
-				Type: graphql.NewNonNull(graphql.String),
 			},
 			"name": &graphql.ArgumentConfig{
 				Type: graphql.String,
@@ -102,28 +99,31 @@ func setupMutation() {
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, "term", "update"); err != nil {
+			if err := utils.ValidateUser(params, taxonomyConfig.Taxonomy, "update"); err != nil {
 				return nil, err
 			}
 
-			return UpdateTerm(params)
+			return UpdateTerm(params, taxonomyConfig)
 		},
 	}
-	mutationFields["termDelete"] = &graphql.Field{
-		Type:        TermType,
-		Description: "Delete term by id.",
+	mutationFields[fmt.Sprintf("%sDelete", taxonomyConfig.Taxonomy)] = &graphql.Field{
+		Type:        taxonomyType,
+		Description: fmt.Sprintf("Delete %s by id.", taxonomyConfig.Taxonomy),
 		Args: graphql.FieldConfigArgument{
 			"id": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.Int),
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			if err := utils.ValidateUser(params, "term", "delete"); err != nil {
+			if err := utils.ValidateUser(params, taxonomyConfig.Taxonomy, "delete"); err != nil {
 				return nil, err
 			}
-			return DeleteTerm(params)
+			return DeleteTerm(params, taxonomyConfig)
 		},
 	}
+}
+
+func setupMutations() {
 	mutationFields["termMetaUpdate"] = &graphql.Field{
 		Type:        MetaType,
 		Description: "Update term meta by term_id and meta_key. If the meta field for the post does not exist, it will be added.",

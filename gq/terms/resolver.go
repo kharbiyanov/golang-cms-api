@@ -9,12 +9,12 @@ import (
 	gormbulk "github.com/t-tiger/gorm-bulk-insert"
 )
 
-func CreateTerm(params graphql.ResolveParams) (interface{}, error) {
+func CreateTerm(params graphql.ResolveParams, taxonomyConfig models.TaxonomyConfig) (interface{}, error) {
 	lang, _ := params.Args["lang"].(string)
 
 	term := &models.Term{
 		Name:     params.Args["name"].(string),
-		Taxonomy: params.Args["taxonomy"].(string),
+		Taxonomy: taxonomyConfig.Taxonomy,
 		Slug:     params.Args["slug"].(string),
 	}
 
@@ -56,16 +56,15 @@ func CreateTerm(params graphql.ResolveParams) (interface{}, error) {
 	return term, nil
 }
 
-func GetTerms(params graphql.ResolveParams) (interface{}, error) {
+func GetTerms(params graphql.ResolveParams, taxonomyConfig models.TaxonomyConfig) (interface{}, error) {
 	lang, _ := params.Args["lang"].(string)
-	tax, _ := params.Args["taxonomy"].(string)
 
 	var terms []models.Term
 
 	tx := utils.DB.Table("terms").
 		Select("terms.*").
 		Joins("left join translations on translations.element_id = terms.id").
-		Where("terms.taxonomy = ? and translations.lang = ? and translations.element_type = ?", tax, lang, fmt.Sprintf("tax_%s", tax))
+		Where("terms.taxonomy = ? and translations.lang = ? and translations.element_type = ?", taxonomyConfig.Taxonomy, lang, fmt.Sprintf("tax_%s", taxonomyConfig.Taxonomy))
 
 	if parent, ok := params.Args["parent"].(int); ok {
 		tx = tx.Where("terms.parent = ?", parent)
@@ -82,9 +81,8 @@ func GetTerms(params graphql.ResolveParams) (interface{}, error) {
 	return terms, nil
 }
 
-func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
+func UpdateTerm(params graphql.ResolveParams, taxonomyConfig models.TaxonomyConfig) (interface{}, error) {
 	id, _ := params.Args["id"].(int)
-	tax, _ := params.Args["taxonomy"].(string)
 
 	fields := make(map[string]interface{})
 
@@ -98,7 +96,7 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 	}
 	if parent, ok := params.Args["parent"].(int); ok {
 		fields["parent"] = parent
-		if utils.DB.Where(&models.Term{ID: parent, Taxonomy: tax}).First(&models.Term{}).RecordNotFound() {
+		if utils.DB.Where(&models.Term{ID: parent, Taxonomy: taxonomyConfig.Taxonomy}).First(&models.Term{}).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
 				Message: errors.TermParentIDNotFoundMessage,
 				Code:    errors.InvalidParamsCode,
@@ -107,7 +105,7 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 	}
 	if slug, ok := params.Args["slug"].(string); ok {
 		fields["slug"] = slug
-		if !utils.DB.Where(&models.Term{Taxonomy: tax, Slug: slug}).Not(&models.Term{ID: id}).First(&term).RecordNotFound() {
+		if !utils.DB.Where(&models.Term{Taxonomy: taxonomyConfig.Taxonomy, Slug: slug}).Not(&models.Term{ID: id}).First(&term).RecordNotFound() {
 			return nil, &errors.ErrorWithCode{
 				Message: errors.TermSlugExistMessage,
 				Code:    errors.InvalidParamsCode,
@@ -124,12 +122,11 @@ func UpdateTerm(params graphql.ResolveParams) (interface{}, error) {
 	return term, nil
 }
 
-func DeleteTerm(params graphql.ResolveParams) (interface{}, error) {
+func DeleteTerm(params graphql.ResolveParams, taxonomyConfig models.TaxonomyConfig) (interface{}, error) {
 	id, _ := params.Args["id"].(int)
-
 	term := models.Term{}
 
-	if utils.DB.First(&term, id).RecordNotFound() {
+	if utils.DB.Where(&models.Term{ID: id, Taxonomy: taxonomyConfig.Taxonomy}).Find(&term).RecordNotFound() {
 		return nil, &errors.ErrorWithCode{
 			Message: errors.TermNotFoundMessage,
 			Code:    errors.InvalidParamsCode,

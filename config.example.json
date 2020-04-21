@@ -10,14 +10,15 @@
     "user": "",
     "pass": ""
   },
+  "siteUrl": "http://localhost:8080",
   "postTypes": [
     {
-      "slug": "news",
-      "pluralSlug": "news"
+      "type": "news",
+      "singleUrl": "/news/{{.Slug}}/"
     },
     {
-      "slug": "page",
-      "pluralSlug": "pages"
+      "type": "page",
+      "singleUrl": "/{{.Slug}}/"
     }
   ]
 }

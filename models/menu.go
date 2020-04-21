@@ -31,3 +31,9 @@ type MenuItem struct {
 	Target    string `gorm:"type:varchar(50)"`
 	Classes   string `gorm:"type:varchar(255)"`
 }
+
+type Permalink struct {
+	Id     int
+	Slug   string
+	Object string
+}

@@ -90,7 +90,7 @@ func (query *PostQuery) setTables() {
 	query.tx = query.tx.Table("posts").
 		Select("posts.*").
 		Joins("LEFT JOIN translations t ON t.element_id = posts.id").
-		Where("posts.type = ? AND t.lang = ? AND t.element_type = ?", query.postConfig.Slug, lang, fmt.Sprintf("post_%s", query.postConfig.Slug))
+		Where("posts.type = ? AND t.lang = ? AND t.element_type = ?", query.postConfig.Type, lang, fmt.Sprintf("post_%s", query.postConfig.Type))
 }
 
 func (query *PostQuery) setOrder() {
