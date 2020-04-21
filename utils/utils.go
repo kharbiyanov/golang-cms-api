@@ -60,12 +60,12 @@ func GetPermalink(object interface{}) (string, error) {
 	tmplText := ""
 	switch obj := object.(type) {
 	case models.Post:
-		postConfig := GetPostConfig(obj.Type)
 		permalink = models.Permalink{
 			Id:     obj.ID,
 			Object: obj.Type,
 			Slug:   obj.Slug,
 		}
+		postConfig := GetPostConfig(obj.Type)
 		tmplText = postConfig.SingleUrl
 	case models.Term:
 		permalink = models.Permalink{
@@ -73,7 +73,8 @@ func GetPermalink(object interface{}) (string, error) {
 			Object: obj.Taxonomy,
 			Slug:   obj.Slug,
 		}
-		tmplText = "/{{.Object}}/{{.Slug}}/"
+		taxonomyConfig := GetTaxonomyConfig(obj.Taxonomy)
+		tmplText = taxonomyConfig.SingleUrl
 	}
 	if _, err := tmpl.Parse(tmplText); err != nil {
 		return "", err
@@ -94,4 +95,16 @@ func GetPostConfig(postType string) models.PostConfig {
 		}
 	}
 	return postConfig
+}
+
+func GetTaxonomyConfig(taxonomy string) models.TaxonomyConfig {
+	c := config.Get()
+	var taxonomyConfig models.TaxonomyConfig
+	for _, conf := range c.Taxonomies {
+		if taxonomy == conf.Taxonomy {
+			taxonomyConfig = conf
+			break
+		}
+	}
+	return taxonomyConfig
 }

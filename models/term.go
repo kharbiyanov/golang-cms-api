@@ -4,6 +4,11 @@ import (
 	"time"
 )
 
+type TaxonomyConfig struct {
+	Taxonomy  string `json:"taxonomy"`
+	SingleUrl string `json:"singleUrl"`
+}
+
 type Term struct {
 	ID          int        `gorm:"type:bigserial; primary_key"`
 	CreatedAt   time.Time  `json:"createdAt"`

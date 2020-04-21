@@ -7,13 +7,14 @@ import (
 )
 
 type config struct {
-	ServerAddr        string              `json:"serverAddr"`
-	RedisAddr         string              `json:"redisAddr"`
-	SiteUrl           string              `json:"siteUrl"`
-	DB                db                  `json:"db"`
-	Debug             bool                `json:"debug"`
-	DefaultPostsLimit int                 `json:"defaultPostsLimit"`
-	PostTypes         []models.PostConfig `json:"postTypes"`
+	ServerAddr        string                  `json:"serverAddr"`
+	RedisAddr         string                  `json:"redisAddr"`
+	SiteUrl           string                  `json:"siteUrl"`
+	DB                db                      `json:"db"`
+	Debug             bool                    `json:"debug"`
+	DefaultPostsLimit int                     `json:"defaultPostsLimit"`
+	PostTypes         []models.PostConfig     `json:"postTypes"`
+	Taxonomies        []models.TaxonomyConfig `json:"taxonomies"`
 }
 
 type db struct {
