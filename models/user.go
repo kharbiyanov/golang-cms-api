@@ -10,7 +10,7 @@ type (
 		CreatedAt  time.Time  `json:"createdAt"`
 		UpdatedAt  time.Time  `json:"updatedAt"`
 		DeletedAt  *time.Time `sql:"index" json:"deletedAt"`
-		UserName   *string    `json:"userName" gorm:"unique;not null"`
+		UserName   string     `json:"userName" gorm:"unique;not null"`
 		Password   string     `json:"-"`
 		LastName   string     `json:"lastName"`
 		FirstName  string     `json:"firstName"`
