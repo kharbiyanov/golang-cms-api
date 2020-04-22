@@ -2,7 +2,6 @@ package server
 
 import (
 	"cms-api/config"
-	"cms-api/services/auth"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -27,10 +26,6 @@ func Run() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-
-	authGroup := router.Group("/auth/")
-	authGroup.POST("/login/", auth.LoginHandler)
-	authGroup.POST("/logout/", auth.LogoutHandler)
 
 	graphqlGroup := router.Group("/graphql/")
 	if c.Debug {

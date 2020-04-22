@@ -90,7 +90,7 @@ func CheckPermission(userName string, object string, action string) error {
 
 	ok := Roles.Enforce(userName, object, action)
 
-	if ! ok {
+	if !ok {
 		return &errors.ErrorWithCode{
 			Message: errors.ForbiddenCodeMessage,
 			Code:    errors.ForbiddenCode,
@@ -104,7 +104,7 @@ func ValidateUser(p graphql.ResolveParams, object string, action string) error {
 	if user, err := CheckToken(p); err != nil {
 		return err
 	} else {
-		if err := CheckPermission(*user.UserName, object, action); err != nil {
+		if err := CheckPermission(user.UserName, object, action); err != nil {
 			return err
 		}
 	}
