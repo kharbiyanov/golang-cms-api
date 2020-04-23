@@ -38,4 +38,19 @@ func setupMutation() {
 			return Logout(params)
 		},
 	}
+	mutationFields["authRegister"] = &graphql.Field{
+		Type:        UserType,
+		Description: "Registration.",
+		Args: graphql.FieldConfigArgument{
+			"username": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"password": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return Register(params)
+		},
+	}
 }

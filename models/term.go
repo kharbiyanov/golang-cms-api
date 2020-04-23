@@ -11,9 +11,9 @@ type TaxonomyConfig struct {
 
 type Term struct {
 	ID          int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
-	DeletedAt   *time.Time `sql:"index" json:"deletedAt"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `sql:"index" json:"deleted_at"`
 	Name        string     `gorm:"not null"`
 	Taxonomy    string     `gorm:"not null"`
 	Description string
@@ -24,8 +24,8 @@ type Term struct {
 
 type TermMeta struct {
 	ID        int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
 	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
 	TermID    int
 	Key       string `gorm:"type:varchar(255)"`
