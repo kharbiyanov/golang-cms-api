@@ -66,3 +66,35 @@ func Logout(params graphql.ResolveParams) (interface{}, error) {
 		Token: token,
 	}, nil
 }
+
+func Register(params graphql.ResolveParams) (interface{}, error) {
+	userName, _ := params.Args["username"].(string)
+	password, _ := params.Args["password"].(string)
+
+	hashPassword, err := utils.HashPassword(password)
+
+	if err != nil {
+		return nil, &errors.ErrorWithCode{
+			Message: err.Error(),
+			Code:    errors.InternalServerErrorCode,
+		}
+	}
+
+	user := &models.User{
+		UserName: userName,
+		Password: hashPassword,
+	}
+
+	if !utils.DB.Where(&models.User{UserName: userName}).First(&user).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.UserNameExistMessage,
+			Code:    errors.InvalidParamsCode,
+		}
+	}
+
+	if err := utils.DB.Create(user).Scan(user).Error; err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}

@@ -20,6 +20,7 @@ const (
 	LangNotFoundMessage          = "Lang Not Found"
 	MenuItemNotFoundMessage      = "Menu Item Not Found"
 	MenuNotFoundMessage          = "Menu Not Found"
+	UserNameExistMessage         = "Username Exist"
 )
 
 type ErrorWithCode struct {

@@ -6,9 +6,9 @@ import (
 
 type Lang struct {
 	ID        int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt time.Time  `json:"createdAt"`
-	UpdatedAt time.Time  `json:"updatedAt"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `sql:"index" json:"deleted_at"`
 	FullName  string     `gorm:"not null" json:"full_name"`
 	Code      string     `gorm:"not null; type:varchar(2); unique;"`
 	Flag      string

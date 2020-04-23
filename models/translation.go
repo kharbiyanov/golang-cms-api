@@ -6,9 +6,9 @@ import (
 
 type Translation struct {
 	ID          int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
-	DeletedAt   *time.Time `sql:"index" json:"deletedAt"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
+	DeletedAt   *time.Time `sql:"index" json:"deleted_at"`
 	ElementType string     `gorm:"not null"`
 	ElementID   int        `gorm:"not null"`
 	GroupID     int        `gorm:"auto_increment; not null"`
