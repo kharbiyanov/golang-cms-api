@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"golang.org/x/crypto/bcrypt"
+	"gopkg.in/gomail.v2"
 	"strings"
 	"text/template"
 	"time"
@@ -107,4 +108,11 @@ func GetTaxonomyConfig(taxonomy string) models.TaxonomyConfig {
 		}
 	}
 	return taxonomyConfig
+}
+
+func SendMail(m *gomail.Message) error {
+	c := config.Get()
+	d := gomail.NewDialer(c.SMTP.Host, c.SMTP.Port, c.SMTP.UserName, c.SMTP.Password)
+
+	return d.DialAndSend(m)
 }

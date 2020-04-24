@@ -15,6 +15,14 @@ type config struct {
 	DefaultPostsLimit int                     `json:"defaultPostsLimit"`
 	PostTypes         []models.PostConfig     `json:"postTypes"`
 	Taxonomies        []models.TaxonomyConfig `json:"taxonomies"`
+	SMTP              smtp                    `json:"smtp"`
+}
+
+type smtp struct {
+	Host     string `json:"host"`
+	Port     int    `json:"port"`
+	UserName string `json:"username"`
+	Password string `json:"password"`
 }
 
 type db struct {

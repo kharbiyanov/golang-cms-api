@@ -10,6 +10,12 @@
     "user": "",
     "pass": ""
   },
+  "smtp": {
+    "host": "smtp.example.com",
+    "port": 587,
+    "username": "user",
+    "password": "123456"
+  },
   "siteUrl": "http://localhost:8080",
   "postTypes": [
     {
