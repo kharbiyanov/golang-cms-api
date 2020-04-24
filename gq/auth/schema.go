@@ -45,12 +45,27 @@ func setupMutation() {
 			"username": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+			"email": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"password": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 			return Register(params)
+		},
+	}
+	mutationFields["authActivate"] = &graphql.Field{
+		Type:        UserType,
+		Description: "Activation.",
+		Args: graphql.FieldConfigArgument{
+			"activation_code": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			return Activate(params)
 		},
 	}
 }
