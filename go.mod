@@ -3,6 +3,7 @@ module cms-api
 go 1.13
 
 require (
+	git.osg.uz/kharbiyanov/graphql-multipart-middleware v0.0.0-20180727164413-5a6fd5cea814
 	github.com/casbin/casbin v1.9.1
 	github.com/casbin/gorm-adapter v1.0.0
 	github.com/garyburd/redigo v1.6.0

@@ -4,6 +4,7 @@ import (
 	"cms-api/config"
 	"cms-api/models"
 	"context"
+	"git.osg.uz/kharbiyanov/graphql-multipart-middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/handler"
@@ -20,16 +21,21 @@ var (
 
 func GetHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		h := handler.New(&handler.Config{
-			Schema:     getSchema(),
-			Pretty:     true,
-			Playground: config.Get().Debug,
-			RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
-				return map[string]interface{}{
-					"context": c,
-				}
-			},
-		})
+		schema := getSchema()
+		h := graphqlmultipart.NewHandler(
+			schema,
+			5*1024*1024,
+			handler.New(&handler.Config{
+				Schema:     schema,
+				GraphiQL:   true,
+				Playground: config.Get().Debug,
+				RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
+					return map[string]interface{}{
+						"context": c,
+					}
+				},
+			}),
+		)
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
