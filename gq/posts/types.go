@@ -55,6 +55,21 @@ var TermType = graphql.NewObject(
 	},
 )
 
+var StateEnum = graphql.NewEnum(graphql.EnumConfig{
+	Name: "State",
+	Values: graphql.EnumValueConfigMap{
+		"TRASH": &graphql.EnumValueConfig{
+			Value: models.PostStateTrash,
+		},
+		"PUBLISH": &graphql.EnumValueConfig{
+			Value: models.PostStatePublish,
+		},
+		"DRAFT": &graphql.EnumValueConfig{
+			Value: models.PostStateDraft,
+		},
+	},
+})
+
 func GetPostType(postConfig models.PostConfig) *graphql.Object {
 	return graphql.NewObject(
 		graphql.ObjectConfig{
@@ -78,8 +93,8 @@ func GetPostType(postConfig models.PostConfig) *graphql.Object {
 				"excerpt": &graphql.Field{
 					Type: graphql.String,
 				},
-				"status": &graphql.Field{
-					Type: graphql.NewNonNull(graphql.String),
+				"state": &graphql.Field{
+					Type: graphql.NewNonNull(StateEnum),
 				},
 				"slug": &graphql.Field{
 					Type: graphql.NewNonNull(graphql.String),

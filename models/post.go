@@ -4,6 +4,15 @@ import (
 	"time"
 )
 
+type PostState int
+
+const (
+	PostStateAny PostState = iota - 1
+	PostStateTrash
+	PostStatePublish
+	PostStateDraft
+)
+
 type PostConfig struct {
 	Type      string `json:"type"`
 	SingleUrl string `json:"singleUrl"`
@@ -18,9 +27,9 @@ type Post struct {
 	Title     string     `gorm:"not null"`
 	Content   string
 	Excerpt   string
-	Status    string `gorm:"not null; type:varchar(50)"`
-	Slug      string `gorm:"not null; type:varchar(255); unique;"`
-	Type      string `gorm:"type:varchar(50)"`
+	State     PostState `gorm:"not null"`
+	Slug      string    `gorm:"not null; type:varchar(255); unique;"`
+	Type      string    `gorm:"type:varchar(50)"`
 	Meta      []PostMeta
 	Terms     []Term
 }

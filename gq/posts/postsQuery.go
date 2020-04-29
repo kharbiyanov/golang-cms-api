@@ -26,7 +26,7 @@ func (query *PostQuery) init() error {
 
 	query.setTables()
 	query.setSearch()
-	query.setStatus()
+	query.setState()
 	query.setOrder()
 	query.setGroup()
 
@@ -112,8 +112,8 @@ func (query *PostQuery) setOrder() {
 			orderBy = "posts.title"
 		case "content":
 			orderBy = "posts.content"
-		case "status":
-			orderBy = "posts.status"
+		case "state":
+			orderBy = "posts.state"
 		case "slug":
 			orderBy = "posts.slug"
 		}
@@ -126,18 +126,15 @@ func (query *PostQuery) setOrder() {
 	query.tx = query.tx.Order(fmt.Sprintf("%s %s", orderBy, order))
 }
 
-func (query *PostQuery) setStatus() {
-	status := "publish"
-	if pStatus, ok := query.params.Args["status"].(string); ok {
-		switch pStatus {
-		case "publish", "draft", "pending", "trash", "any":
-			status = pStatus
-		}
+func (query *PostQuery) setState() {
+	state := models.PostStatePublish
+	if pState, ok := query.params.Args["state"].(models.PostState); ok {
+		state = pState
 	}
-	if status == "any" {
-		query.tx = query.tx.Where("posts.status <> ?", "trash")
+	if state == models.PostStateAny {
+		query.tx = query.tx.Where("posts.state <> ?", models.PostStateTrash)
 	} else {
-		query.tx = query.tx.Where("posts.status = ?", status)
+		query.tx = query.tx.Where("posts.state = ?", state)
 	}
 }
 
