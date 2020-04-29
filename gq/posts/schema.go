@@ -58,9 +58,9 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"lang": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"status": &graphql.ArgumentConfig{
-				Type:         graphql.String,
-				DefaultValue: "publish",
+			"state": &graphql.ArgumentConfig{
+				Type:         StateEnum,
+				DefaultValue: models.PostStatePublish,
 			},
 			"first": &graphql.ArgumentConfig{
 				Type:         graphql.Int,
@@ -72,7 +72,7 @@ func setupPostsQuery(postType *graphql.Object, postConfig models.PostConfig) {
 			"order_by": &graphql.ArgumentConfig{
 				Type:         graphql.String,
 				DefaultValue: "date",
-				Description:  "Available params: date, updated, author, title, content, status, slug",
+				Description:  "Available params: date, updated, author, title, content, state, slug",
 			},
 			"order": &graphql.ArgumentConfig{
 				Type:         graphql.String,
@@ -121,9 +121,9 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 			"excerpt": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
-			"status": &graphql.ArgumentConfig{
-				Type:         graphql.String,
-				DefaultValue: "publish",
+			"state": &graphql.ArgumentConfig{
+				Type:         StateEnum,
+				DefaultValue: models.PostStatePublish,
 			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -154,8 +154,8 @@ func setupPostsMutation(postType *graphql.Object, postConfig models.PostConfig) 
 			"excerpt": &graphql.ArgumentConfig{
 				Type: graphql.String,
 			},
-			"status": &graphql.ArgumentConfig{
-				Type: graphql.String,
+			"state": &graphql.ArgumentConfig{
+				Type: StateEnum,
 			},
 			"slug": &graphql.ArgumentConfig{
 				Type: graphql.String,

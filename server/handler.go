@@ -27,7 +27,7 @@ func GetHandler() gin.HandlerFunc {
 			5*1024*1024,
 			handler.New(&handler.Config{
 				Schema:     schema,
-				GraphiQL:   true,
+				GraphiQL:   false,
 				Playground: config.Get().Debug,
 				RootObjectFn: func(ctx context.Context, r *http.Request) map[string]interface{} {
 					return map[string]interface{}{
