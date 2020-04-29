@@ -3,8 +3,8 @@ package main
 import "cms-api/models"
 
 var plugin = models.Plugin{
-	ID:     "media",
-	Name:   "Media",
+	ID:     "files",
+	Name:   "Files",
 	Enable: true,
 }
 

@@ -3,6 +3,7 @@ package utils
 import (
 	"cms-api/models"
 	"fmt"
+	"github.com/gabriel-vasile/mimetype"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"io"
 	"math/rand"
@@ -22,7 +23,8 @@ func SaveFile(fh *multipart.FileHeader) (*models.UploadedFile, error) {
 
 	defer file.Close()
 
-	uploadedFile := getFileName(fh.Filename)
+	uploadedFile := &models.UploadedFile{}
+	setFileInfo(fh, uploadedFile)
 
 	if _, err := os.Stat(uploadedFile.Path); err != nil {
 		if os.IsNotExist(err) {
@@ -32,32 +34,37 @@ func SaveFile(fh *multipart.FileHeader) (*models.UploadedFile, error) {
 		}
 	}
 
-	f, err := os.OpenFile(fmt.Sprintf("%s/%s", uploadedFile.Path, uploadedFile.Name), os.O_WRONLY|os.O_CREATE, 0644)
+	f, err := os.OpenFile(uploadedFile.GetPath(), os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
 	}
-
 	defer f.Close()
 
 	if _, err := io.Copy(f, file); err != nil {
 		return nil, err
 	}
 
+	mime, err := mimetype.DetectFile(uploadedFile.GetPath())
+
+	if err != nil {
+		return nil, err
+	}
+
+	uploadedFile.MimeType = mime.String()
+
 	return uploadedFile, err
 }
 
-func getFileName(filename string) *models.UploadedFile {
+func setFileInfo(fh *multipart.FileHeader, file *models.UploadedFile) {
 	rand.Seed(time.Now().UnixNano())
 	currentTime := time.Now()
 
-	ext := filepath.Ext(filename)
-	wExt := strings.TrimSuffix(filename, ext)
+	ext := filepath.Ext(fh.Filename)
+	wExt := strings.TrimSuffix(fh.Filename, ext)
 	name := fmt.Sprintf("%s-%d%s", wExt, rand.Intn(100), ext)
-	path := currentTime.Format("uploads/2006/01/02")
+	path := currentTime.Format("files/2006/01")
 
-	return &models.UploadedFile{
-		Name:     name,
-		Path:     path,
-		Original: filename,
-	}
+	file.Name = name
+	file.Path = path
+	file.Original = fh.Filename
 }

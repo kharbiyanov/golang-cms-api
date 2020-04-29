@@ -42,5 +42,6 @@ func init() {
 		&models.Translation{},
 		&models.Menu{},
 		&models.MenuItem{},
+		&models.File{},
 	)
 }

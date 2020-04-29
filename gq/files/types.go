@@ -4,9 +4,9 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-var MediaType = graphql.NewObject(
+var FileType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "Media",
+		Name: "File",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.Int),
@@ -17,8 +17,14 @@ var MediaType = graphql.NewObject(
 			"updated_at": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.String),
 			},
-			"name": &graphql.Field{
-				Type: graphql.String,
+			"title": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"mime_type": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"file": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
 	},

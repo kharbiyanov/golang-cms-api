@@ -24,16 +24,19 @@ func setupQuery() {
 }
 
 func setupMutation() {
-	mutationFields["mediaUpload"] = &graphql.Field{
-		Type:        MediaType,
-		Description: "Upload new media.",
+	mutationFields["fileCreate"] = &graphql.Field{
+		Type:        FileType,
+		Description: "Create new file.",
 		Args: graphql.FieldConfigArgument{
+			"lang": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
 			"file": &graphql.ArgumentConfig{
-				Type: graphqlmultipart.Upload,
+				Type: graphql.NewNonNull(graphqlmultipart.Upload),
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-			return UploadMedia(params)
+			return UploadFile(params)
 		},
 	}
 }
