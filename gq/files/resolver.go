@@ -10,15 +10,16 @@ import (
 func UploadFile(params graphql.ResolveParams) (interface{}, error) {
 	lang, _ := params.Args["lang"].(string)
 	fh := params.Args["file"].(*multipart.FileHeader)
-	uploadedFile, err := utils.SaveFile(fh)
-
-	if err != nil {
+	uploadedFile := utils.UploadedFile{
+		Header: fh,
+	}
+	if err := uploadedFile.Save(); err != nil {
 		return nil, err
 	}
 
 	file := &models.File{
 		Title:    uploadedFile.Original,
-		MimeType: uploadedFile.MimeType,
+		MimeType: uploadedFile.MimeType.String(),
 		File:     uploadedFile.GetPath(),
 	}
 
