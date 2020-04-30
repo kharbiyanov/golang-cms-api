@@ -2,7 +2,8 @@ package main
 
 import (
 	"cms-api/models"
-	"git.osg.uz/kharbiyanov/graphql-multipart-middleware"
+	"cms-api/utils"
+	graphqlmultipart "git.osg.uz/kharbiyanov/graphql-multipart-middleware"
 	"github.com/graphql-go/graphql"
 )
 
@@ -36,6 +37,10 @@ func setupMutation() {
 			},
 		},
 		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "file", "create"); err != nil {
+				return nil, err
+			}
+
 			return UploadFile(params)
 		},
 	}
