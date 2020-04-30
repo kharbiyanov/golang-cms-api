@@ -1,7 +1,8 @@
 package utils
 
 import (
-	"cms-api/models"
+	"cms-api/config"
+	"errors"
 	"fmt"
 	"github.com/gabriel-vasile/mimetype"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -14,57 +15,78 @@ import (
 	"time"
 )
 
-func SaveFile(fh *multipart.FileHeader) (*models.UploadedFile, error) {
-	file, err := fh.Open()
+type UploadedFile struct {
+	Header   *multipart.FileHeader
+	Name     string
+	Path     string
+	Original string
+	MimeType *mimetype.MIME
+}
+
+func (f *UploadedFile) Save() error {
+	file, err := f.Header.Open()
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	defer file.Close()
 
-	uploadedFile := &models.UploadedFile{}
-	setFileInfo(fh, uploadedFile)
+	if err := f.checkMimeType(); err != nil {
+		return err
+	}
 
-	if _, err := os.Stat(uploadedFile.Path); err != nil {
+	f.setFileInfo()
+
+	if _, err := os.Stat(f.Path); err != nil {
 		if os.IsNotExist(err) {
-			if errDir := os.MkdirAll(uploadedFile.Path, 0755); errDir != nil {
-				return nil, err
+			if errDir := os.MkdirAll(f.Path, 0755); errDir != nil {
+				return err
 			}
 		}
 	}
 
-	f, err := os.OpenFile(uploadedFile.GetPath(), os.O_WRONLY|os.O_CREATE, 0644)
+	ff, err := os.OpenFile(f.GetPath(), os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	defer f.Close()
+	defer ff.Close()
 
-	if _, err := io.Copy(f, file); err != nil {
-		return nil, err
-	}
-
-	mime, err := mimetype.DetectFile(uploadedFile.GetPath())
-
-	if err != nil {
-		return nil, err
+	if _, err := io.Copy(ff, file); err != nil {
+		return err
 	}
 
-	uploadedFile.MimeType = mime.String()
-
-	return uploadedFile, err
+	return nil
 }
 
-func setFileInfo(fh *multipart.FileHeader, file *models.UploadedFile) {
+func (f *UploadedFile) GetPath() string {
+	return fmt.Sprintf("%s/%s", f.Path, f.Name)
+}
+
+func (f *UploadedFile) setFileInfo() {
 	rand.Seed(time.Now().UnixNano())
 	currentTime := time.Now()
 
-	ext := filepath.Ext(fh.Filename)
-	wExt := strings.TrimSuffix(fh.Filename, ext)
+	ext := filepath.Ext(f.Header.Filename)
+	wExt := strings.TrimSuffix(f.Header.Filename, ext)
 	name := fmt.Sprintf("%s-%d%s", wExt, rand.Intn(100), ext)
 	path := currentTime.Format("files/2006/01")
 
-	file.Name = name
-	file.Path = path
-	file.Original = fh.Filename
+	f.Name = name
+	f.Path = path
+	f.Original = f.Header.Filename
+}
+
+func (f *UploadedFile) checkMimeType() error {
+	reader, _ := f.Header.Open()
+	mime, err := mimetype.DetectReader(reader)
+	defer reader.Close()
+	if err != nil {
+		return err
+	}
+	f.MimeType = mime
+	if !mimetype.EqualsAny(mime.String(), config.Get().MimeTypes...) {
+		return errors.New(fmt.Sprintf("%s is now allowed", mime))
+	}
+	return nil
 }

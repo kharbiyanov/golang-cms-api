@@ -16,6 +16,7 @@ type config struct {
 	PostTypes         []models.PostConfig     `json:"postTypes"`
 	Taxonomies        []models.TaxonomyConfig `json:"taxonomies"`
 	SMTP              smtp                    `json:"smtp"`
+	MimeTypes         []string                `json:"mimeTypes"`
 }
 
 type smtp struct {
@@ -56,6 +57,8 @@ func init() {
 
 	viper.SetDefault("defaultPostsLimit", 10)
 
+	viper.SetDefault("mimeTypes", mimeTypes)
+
 	if err := viper.Unmarshal(&c); err != nil {
 		log.Panicf("Unable to decode into struct, %v", err)
 	}
@@ -73,4 +76,92 @@ func init() {
 
 func Get() config {
 	return c
+}
+
+var mimeTypes = []string{
+	//.jpg .jpeg
+	"image/jpeg",
+	"image/pjpeg",
+	//.png
+	"image/png",
+	//.gif
+	"image/gif",
+	//.ico
+	"image/x-icon",
+	//.pdf
+	"application/pdf",
+	//.doc
+	"application/msword",
+	//.docx
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	//.ppt
+	"application/mspowerpoint",
+	"application/powerpoint",
+	"application/vnd.ms-powerpoint",
+	"application/x-mspowerpoint",
+	//.pptx
+	"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+	//.pps
+	"application/mspowerpoint",
+	"application/vnd.ms-powerpoint",
+	//.ppsx
+	"application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+	//.odt
+	"application/vnd.oasis.opendocument.text",
+	//.xls
+	"application/excel",
+	"application/vnd.ms-excel",
+	"application/x-excel",
+	"application/x-msexcel",
+	//.xlsx
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	//.psd
+	"application/octet-stream",
+	//.mp3
+	"audio/mpeg3",
+	"audio/x-mpeg-3",
+	"video/mpeg",
+	"video/x-mpeg",
+	//.m4a
+	"audio/m4a",
+	//.ogg
+	"audio/ogg",
+	//.wav
+	"audio/wav",
+	"audio/x-wav",
+	//.mp4
+	"video/mp4",
+	//.m4v
+	"video/x-m4v",
+	//.mov
+	"video/quicktime",
+	//.wmv
+	"video/x-ms-asf",
+	"video/x-ms-wmv",
+	//.avi
+	"application/x-troff-msvideo",
+	"video/avi",
+	"video/msvideo",
+	"video/x-msvideo",
+	//.mpg
+	"audio/mpeg",
+	"video/mpeg",
+	//.ogv
+	"video/ogg",
+	//.3gp
+	"video/3gpp",
+	"audio/3gpp",
+	//.3g2
+	"video/3gpp2",
+	"audio/3gpp2",
+	//.tar
+	"application/x-tar",
+	//.zip
+	"application/zip",
+	//.gz .gzip
+	"application/x-zip",
+	//.rar
+	"application/rar",
+	//.7z
+	"application/x-7z-compressed",
 }
