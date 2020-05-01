@@ -36,16 +36,18 @@ func GetPosts(params graphql.ResolveParams, postConfig models.PostConfig) (inter
 
 func CreatePost(params graphql.ResolveParams, postConfig models.PostConfig) (interface{}, error) {
 	state := models.PostStatePublish
+	authUser := utils.GetAuthUser(params)
 
 	if pState, ok := params.Args["state"].(models.PostState); ok {
 		state = pState
 	}
 
 	post := &models.Post{
-		Title: params.Args["title"].(string),
-		State: state,
-		Slug:  params.Args["slug"].(string),
-		Type:  postConfig.Type,
+		Title:    params.Args["title"].(string),
+		State:    state,
+		Slug:     params.Args["slug"].(string),
+		Type:     postConfig.Type,
+		AuthorID: authUser.ID,
 	}
 
 	if content, ok := params.Args["content"].(string); ok {

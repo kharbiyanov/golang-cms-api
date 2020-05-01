@@ -9,9 +9,11 @@ import (
 
 func CreateMenu(params graphql.ResolveParams) (interface{}, error) {
 	lang, _ := params.Args["lang"].(string)
+	authUser := utils.GetAuthUser(params)
 
 	menu := &models.Menu{
-		Name: params.Args["name"].(string),
+		Name:     params.Args["name"].(string),
+		AuthorID: authUser.ID,
 	}
 
 	if err := utils.DB.Create(&menu).Scan(&menu).Error; err != nil {
@@ -67,10 +69,12 @@ func UpdateMenu(params graphql.ResolveParams) (interface{}, error) {
 func CreateMenuItem(params graphql.ResolveParams) (interface{}, error) {
 	menuID, _ := params.Args["menu_id"].(int)
 	itemType, _ := params.Args["type"].(string)
+	authUser := utils.GetAuthUser(params)
 
 	menuItem := &models.MenuItem{
-		MenuID: menuID,
-		Type:   itemType,
+		MenuID:   menuID,
+		Type:     itemType,
+		AuthorID: authUser.ID,
 	}
 
 	if title, ok := params.Args["title"].(string); ok {

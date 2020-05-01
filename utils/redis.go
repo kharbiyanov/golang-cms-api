@@ -41,15 +41,8 @@ func GenerateToken(user models.User) (string, time.Time, error) {
 	return token, expTime, nil
 }
 
-func CheckToken(p graphql.ResolveParams) (models.User, error) {
-	ctx := GetContextFromParams(p)
+func CheckToken(token string) (models.User, error) {
 	user := models.User{}
-
-	token, err := GetBearerToken(ctx.GetHeader("Authorization"))
-
-	if err != nil {
-		return user, err
-	}
 
 	response, err := Redis.Do("GET", token)
 	if err != nil {
@@ -101,15 +94,14 @@ func CheckPermission(userName string, object string, action string) error {
 }
 
 func ValidateUser(p graphql.ResolveParams, object string, action string) error {
-	if user, err := CheckToken(p); err != nil {
-		return err
-	} else {
-		if err := CheckPermission(user.UserName, object, action); err != nil {
-			return err
-		}
+	user := GetAuthUser(p)
+	if user != nil {
+		return CheckPermission(user.UserName, object, action)
 	}
-
-	return nil
+	return &errors.ErrorWithCode{
+		Message: errors.InvalidTokenErrorCodeMessage,
+		Code:    errors.ForbiddenCode,
+	}
 }
 
 func RemoveToken(token string) error {
