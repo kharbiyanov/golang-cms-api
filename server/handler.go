@@ -3,6 +3,7 @@ package server
 import (
 	"cms-api/config"
 	"cms-api/models"
+	"cms-api/utils"
 	"context"
 	graphqlmultipart "git.osg.uz/kharbiyanov/graphql-multipart-middleware"
 	"github.com/gin-gonic/gin"
@@ -22,8 +23,12 @@ var (
 func GetHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		schema := getSchema()
+		authUser, err := getAuthUser(c)
 		rootObj := map[string]interface{}{
-			"context": c,
+			"ginContext": c,
+		}
+		if err == nil {
+			rootObj["user"] = authUser
 		}
 		h := graphqlmultipart.NewHandler(
 			schema,
@@ -40,6 +45,22 @@ func GetHandler() gin.HandlerFunc {
 		)
 		h.ServeHTTP(c.Writer, c.Request)
 	}
+}
+
+func getAuthUser(c *gin.Context) (*models.User, error) {
+	token, err := utils.GetBearerToken(c.GetHeader("Authorization"))
+
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := utils.CheckToken(token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }
 
 func getSchema() *graphql.Schema {

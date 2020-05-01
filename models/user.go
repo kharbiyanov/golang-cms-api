@@ -6,7 +6,7 @@ import (
 
 type (
 	User struct {
-		ID             uint       `gorm:"primary_key"`
+		ID             int        `gorm:"type:bigserial; primary_key"`
 		CreatedAt      time.Time  `json:"created_at"`
 		UpdatedAt      time.Time  `json:"updated_at"`
 		DeletedAt      *time.Time `sql:"index" json:"deleted_at"`

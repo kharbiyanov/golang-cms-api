@@ -9,7 +9,9 @@ import (
 
 func UploadFile(params graphql.ResolveParams) (interface{}, error) {
 	lang, _ := params.Args["lang"].(string)
-	fh := params.Args["file"].(*multipart.FileHeader)
+	fh, _ := params.Args["file"].(*multipart.FileHeader)
+	authUser := utils.GetAuthUser(params)
+
 	uploadedFile := utils.UploadedFile{
 		Header: fh,
 	}
@@ -21,6 +23,7 @@ func UploadFile(params graphql.ResolveParams) (interface{}, error) {
 		Title:    uploadedFile.Original,
 		MimeType: uploadedFile.MimeType.String(),
 		File:     uploadedFile.GetPath(),
+		AuthorID: authUser.ID,
 	}
 
 	if err := utils.DB.Create(file).Scan(file).Error; err != nil {

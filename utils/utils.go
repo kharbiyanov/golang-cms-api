@@ -35,9 +35,17 @@ func GetTokenExpDuration(remember bool) time.Duration {
 	return expDuration
 }
 
+func GetAuthUser(p graphql.ResolveParams) *models.User {
+	rootValue := p.Info.RootValue.(map[string]interface{})
+	if user, ok := rootValue["user"].(*models.User); ok {
+		return user
+	}
+	return nil
+}
+
 func GetContextFromParams(p graphql.ResolveParams) *gin.Context {
 	rootValue := p.Info.RootValue.(map[string]interface{})
-	return rootValue["context"].(*gin.Context)
+	return rootValue["ginContext"].(*gin.Context)
 }
 
 func GetBearerToken(bearer string) (string, error) {
