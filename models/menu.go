@@ -5,13 +5,14 @@ import (
 )
 
 type Menu struct {
-	ID        int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
-	AuthorID  int        `gorm:"not null"`
-	Name      string     `gorm:"not null"`
-	Items     []MenuItem
+	ID           int        `gorm:"type:bigserial; primary_key"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+	DeletedAt    *time.Time `sql:"index" json:"deletedAt"`
+	AuthorID     int        `gorm:"not null"`
+	Name         string     `gorm:"not null"`
+	Items        []MenuItem
+	Translations []Translation
 }
 
 type MenuItem struct {

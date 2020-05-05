@@ -177,6 +177,29 @@ func GetTermsInPost(params graphql.ResolveParams) (interface{}, error) {
 	return post.Terms, nil
 }
 
+func GetTranslationsInPost(params graphql.ResolveParams) (interface{}, error) {
+	post, postExist := params.Source.(models.Post)
+
+	if !postExist {
+		return nil, nil
+	}
+
+	elementType := fmt.Sprintf("post_%s", post.Type)
+
+	innerSql := utils.DB.Table("translations t").Select("t.group_id").Where("t.element_id = ? AND t.element_type = ?", post.ID, elementType).QueryExpr()
+
+	tx := utils.DB.Table("translations").
+		Select("translations.*").
+		Joins("LEFT JOIN lang l ON translations.lang = l.code").
+		Where("l.deleted_at IS NULL AND translations.element_type = ? AND translations.group_id = (?)", elementType, innerSql)
+
+	if err := tx.Find(&post.Translations).Error; err != nil {
+		return nil, err
+	}
+
+	return post.Translations, nil
+}
+
 func GetMeta(params graphql.ResolveParams) (interface{}, error) {
 	postId, _ := params.Args["post_id"].(int)
 	keys, keysExist := params.Args["keys"].([]interface{})

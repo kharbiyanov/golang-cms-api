@@ -205,3 +205,26 @@ func SetTerms(params graphql.ResolveParams) (interface{}, error) {
 
 	return nil, gormbulk.BulkInsert(utils.DB, insertTerms, 3000)
 }
+
+func GetTranslationsInTerm(params graphql.ResolveParams) (interface{}, error) {
+	term, termExist := params.Source.(models.Term)
+
+	if !termExist {
+		return nil, nil
+	}
+
+	elementType := fmt.Sprintf("tax_%s", term.Taxonomy)
+
+	innerSql := utils.DB.Table("translations t").Select("t.group_id").Where("t.element_id = ? AND t.element_type = ?", term.ID, elementType).QueryExpr()
+
+	tx := utils.DB.Table("translations").
+		Select("translations.*").
+		Joins("LEFT JOIN lang l ON translations.lang = l.code").
+		Where("l.deleted_at IS NULL AND translations.element_type = ? AND translations.group_id = (?)", elementType, innerSql)
+
+	if err := tx.Find(&term.Translations).Error; err != nil {
+		return nil, err
+	}
+
+	return term.Translations, nil
+}
