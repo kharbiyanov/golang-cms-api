@@ -19,19 +19,20 @@ type PostConfig struct {
 }
 
 type Post struct {
-	ID        int        `gorm:"type:bigserial; primary_key"`
-	CreatedAt time.Time  `json:"created_at"`
-	UpdatedAt time.Time  `json:"updated_at"`
-	DeletedAt *time.Time `sql:"index" json:"deletedAt"`
-	AuthorID  int        `gorm:"not null"`
-	Title     string     `gorm:"not null"`
-	Content   string
-	Excerpt   string
-	State     PostState `gorm:"not null"`
-	Slug      string    `gorm:"not null; type:varchar(255); unique;"`
-	Type      string    `gorm:"type:varchar(50)"`
-	Meta      []PostMeta
-	Terms     []Term
+	ID           int        `gorm:"type:bigserial; primary_key"`
+	CreatedAt    time.Time  `json:"created_at"`
+	UpdatedAt    time.Time  `json:"updated_at"`
+	DeletedAt    *time.Time `sql:"index" json:"deletedAt"`
+	AuthorID     int        `gorm:"not null"`
+	Title        string     `gorm:"not null"`
+	Content      string
+	Excerpt      string
+	State        PostState `gorm:"not null"`
+	Slug         string    `gorm:"not null; type:varchar(255); unique;"`
+	Type         string    `gorm:"type:varchar(50)"`
+	Meta         []PostMeta
+	Terms        []Term
+	Translations []Translation
 }
 
 type PostMeta struct {

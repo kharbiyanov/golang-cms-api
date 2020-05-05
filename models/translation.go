@@ -10,7 +10,7 @@ type Translation struct {
 	UpdatedAt   time.Time  `json:"updated_at"`
 	DeletedAt   *time.Time `sql:"index" json:"deleted_at"`
 	ElementType string     `gorm:"not null"`
-	ElementID   int        `gorm:"not null"`
+	ElementID   int        `gorm:"not null" json:"element_id"`
 	GroupID     int        `gorm:"auto_increment; not null"`
 	Lang        string     `gorm:"not null; type:varchar(2);"`
 }

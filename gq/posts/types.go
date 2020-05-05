@@ -23,6 +23,20 @@ var MetaType = graphql.NewObject(
 	},
 )
 
+var TranslationType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "PostTranslation",
+		Fields: graphql.Fields{
+			"element_id": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"lang": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+	},
+)
+
 var TermType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "TermType",
@@ -119,6 +133,12 @@ func GetPostType(postConfig models.PostConfig) *graphql.Object {
 					},
 					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 						return GetTermsInPost(params)
+					},
+				},
+				"translations": &graphql.Field{
+					Type: graphql.NewList(TranslationType),
+					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+						return GetTranslationsInPost(params)
 					},
 				},
 			},

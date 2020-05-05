@@ -4,6 +4,20 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
+var TranslationType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "FileTranslation",
+		Fields: graphql.Fields{
+			"element_id": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"lang": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+	},
+)
+
 var FileType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "File",
@@ -25,6 +39,12 @@ var FileType = graphql.NewObject(
 			},
 			"file": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.String),
+			},
+			"translations": &graphql.Field{
+				Type: graphql.NewList(TranslationType),
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					return GetTranslationsInFile(params)
+				},
 			},
 		},
 	},

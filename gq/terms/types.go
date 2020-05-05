@@ -6,6 +6,20 @@ import (
 	"strings"
 )
 
+var TranslationType = graphql.NewObject(
+	graphql.ObjectConfig{
+		Name: "TermTranslation",
+		Fields: graphql.Fields{
+			"element_id": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"lang": &graphql.Field{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+	},
+)
+
 var MetaType = graphql.NewObject(
 	graphql.ObjectConfig{
 		Name: "TermMeta",
@@ -55,6 +69,12 @@ func GetTaxonomyType(taxonomyConfig models.TaxonomyConfig) *graphql.Object {
 					},
 					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
 						return GetMetaInTerm(params)
+					},
+				},
+				"translations": &graphql.Field{
+					Type: graphql.NewList(TranslationType),
+					Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+						return GetTranslationsInTerm(params)
 					},
 				},
 			},

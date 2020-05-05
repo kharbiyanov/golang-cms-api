@@ -252,3 +252,24 @@ func GetMenuItemList(params graphql.ResolveParams) (interface{}, error) {
 
 	return items, nil
 }
+
+func GetTranslationsInMenu(params graphql.ResolveParams) (interface{}, error) {
+	menu, menuExist := params.Source.(models.Menu)
+
+	if !menuExist {
+		return nil, nil
+	}
+
+	innerSql := utils.DB.Table("translations t").Select("t.group_id").Where("t.element_id = ? AND t.element_type = ?", menu.ID, "menu").QueryExpr()
+
+	tx := utils.DB.Table("translations").
+		Select("translations.*").
+		Joins("LEFT JOIN lang l ON translations.lang = l.code").
+		Where("l.deleted_at IS NULL AND translations.element_type = ? AND translations.group_id = (?)", "menu", innerSql)
+
+	if err := tx.Find(&menu.Translations).Error; err != nil {
+		return nil, err
+	}
+
+	return menu.Translations, nil
+}

@@ -64,3 +64,24 @@ func GetFiles(params graphql.ResolveParams) (interface{}, error) {
 	}
 	return files, nil
 }
+
+func GetTranslationsInFile(params graphql.ResolveParams) (interface{}, error) {
+	file, fileExist := params.Source.(models.File)
+
+	if !fileExist {
+		return nil, nil
+	}
+
+	innerSql := utils.DB.Table("translations t").Select("t.group_id").Where("t.element_id = ? AND t.element_type = ?", file.ID, "file").QueryExpr()
+
+	tx := utils.DB.Table("translations").
+		Select("translations.*").
+		Joins("LEFT JOIN lang l ON translations.lang = l.code").
+		Where("l.deleted_at IS NULL AND translations.element_type = ? AND translations.group_id = (?)", "file", innerSql)
+
+	if err := tx.Find(&file.Translations).Error; err != nil {
+		return nil, err
+	}
+
+	return file.Translations, nil
+}
