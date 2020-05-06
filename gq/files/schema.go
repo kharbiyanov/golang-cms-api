@@ -71,4 +71,23 @@ func setupMutation() {
 			return UploadFile(params)
 		},
 	}
+	mutationFields["fileUpdate"] = &graphql.Field{
+		Type:        FileType,
+		Description: "Update file.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"title": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "file", "update"); err != nil {
+				return nil, err
+			}
+
+			return UpdateFile(params)
+		},
+	}
 }
