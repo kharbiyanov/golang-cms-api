@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cms-api/config"
 	"cms-api/models"
 	"cms-api/utils"
 	"github.com/graphql-go/graphql"
@@ -44,25 +45,33 @@ func UploadFile(params graphql.ResolveParams) (interface{}, error) {
 }
 
 func GetFiles(params graphql.ResolveParams) (interface{}, error) {
+	first := config.Get().DefaultPostsLimit
+	result := struct {
+		Data  []models.File `json:"data"`
+		Count int           `json:"count"`
+	}{}
+
 	lang, _ := params.Args["lang"].(string)
-	// TODO: добавить кол-во найденных результатов
-	var files []models.File
 
 	tx := utils.DB.Table("files").
 		Select("files.*").
 		Joins("left join translations on translations.element_id = files.id").
 		Where("translations.lang = ? and translations.element_type = ?", lang, "file")
 
-	if first, ok := params.Args["first"].(int); ok {
-		tx = tx.Limit(first)
+	if err := tx.Count(&result.Count).Error; err != nil {
+		return nil, err
 	}
+	if pFirst, ok := params.Args["first"].(int); ok {
+		first = pFirst
+	}
+	tx = tx.Limit(first)
 	if offset, ok := params.Args["offset"].(int); ok {
 		tx = tx.Offset(offset)
 	}
-	if err := tx.Find(&files).Error; err != nil {
+	if err := tx.Find(&result.Data).Error; err != nil {
 		return nil, err
 	}
-	return files, nil
+	return result, nil
 }
 
 func GetTranslationsInFile(params graphql.ResolveParams) (interface{}, error) {
