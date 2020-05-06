@@ -44,6 +44,17 @@ func UploadFile(params graphql.ResolveParams) (interface{}, error) {
 	return file, nil
 }
 
+func UpdateFile(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	title, _ := params.Args["title"].(string)
+
+	var file models.File
+
+	err := utils.DB.Model(&file).Where("id = ?", id).Update("title", title).Find(&file).Error
+
+	return file, err
+}
+
 func GetFiles(params graphql.ResolveParams) (interface{}, error) {
 	first := config.Get().DefaultPostsLimit
 	result := struct {
