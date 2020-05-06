@@ -20,6 +20,7 @@ const (
 	LangNotFoundMessage           = "Lang Not Found"
 	MenuItemNotFoundMessage       = "Menu Item Not Found"
 	MenuNotFoundMessage           = "Menu Not Found"
+	FileNotFoundMessage           = "File Not Found"
 	UserNameExistMessage          = "Username Exist"
 	EmailExistMessage             = "Email Exist"
 	UserNotActivatedMessage       = "User Not Activated"

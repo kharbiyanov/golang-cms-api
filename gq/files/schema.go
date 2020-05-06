@@ -90,4 +90,20 @@ func setupMutation() {
 			return UpdateFile(params)
 		},
 	}
+	mutationFields["fileDelete"] = &graphql.Field{
+		Type:        FileType,
+		Description: "Delete file.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "file", "delete"); err != nil {
+				return nil, err
+			}
+
+			return DeleteFile(params)
+		},
+	}
 }

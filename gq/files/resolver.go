@@ -2,10 +2,12 @@ package main
 
 import (
 	"cms-api/config"
+	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
 	"github.com/graphql-go/graphql"
 	"mime/multipart"
+	"os"
 )
 
 func UploadFile(params graphql.ResolveParams) (interface{}, error) {
@@ -55,6 +57,28 @@ func UpdateFile(params graphql.ResolveParams) (interface{}, error) {
 	return file, err
 }
 
+func DeleteFile(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	file := models.File{}
+
+	if utils.DB.First(&file, id).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.FileNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
+	}
+
+	if err := utils.DB.Delete(file).Error; err != nil {
+		return nil, err
+	}
+
+	if err := os.Remove(file.File); err != nil {
+		return nil, err
+	}
+
+	return file, nil
+}
+
 func GetFiles(params graphql.ResolveParams) (interface{}, error) {
 	first := config.Get().DefaultPostsLimit
 	result := struct {
@@ -67,7 +91,8 @@ func GetFiles(params graphql.ResolveParams) (interface{}, error) {
 	tx := utils.DB.Table("files").
 		Select("files.*").
 		Joins("left join translations on translations.element_id = files.id").
-		Where("translations.lang = ? and translations.element_type = ?", lang, "file")
+		Where("translations.lang = ? and translations.element_type = ?", lang, "file").
+		Order("files.created_at desc")
 
 	if err := tx.Count(&result.Count).Error; err != nil {
 		return nil, err
