@@ -76,7 +76,7 @@ func DeleteFile(params graphql.ResolveParams) (interface{}, error) {
 		return nil, err
 	}
 
-	return file, nil
+	return file, utils.DB.Delete(&models.Translation{}, &models.Translation{ElementType: "file", ElementID: id}).Error
 }
 
 func GetFiles(params graphql.ResolveParams) (interface{}, error) {

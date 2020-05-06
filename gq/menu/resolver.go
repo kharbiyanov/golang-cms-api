@@ -52,7 +52,7 @@ func DeleteMenu(params graphql.ResolveParams) (interface{}, error) {
 		return nil, err
 	}
 
-	return menu, nil
+	return menu, utils.DB.Delete(&models.Translation{}, &models.Translation{ElementType: "menu", ElementID: id}).Error
 }
 
 func UpdateMenu(params graphql.ResolveParams) (interface{}, error) {

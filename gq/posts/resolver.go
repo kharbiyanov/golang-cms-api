@@ -130,7 +130,12 @@ func DeletePost(params graphql.ResolveParams, postConfig models.PostConfig) (int
 	if err := utils.DB.Delete(&post).Error; err != nil {
 		return nil, err
 	}
-	return nil, utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: id}).Error
+
+	if err := utils.DB.Delete(&models.PostMeta{}, &models.PostMeta{PostID: id}).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, utils.DB.Delete(&models.Translation{}, &models.Translation{ElementType: fmt.Sprintf("post_%s", postConfig.Type), ElementID: id}).Error
 }
 
 func GetMetaInPost(params graphql.ResolveParams) (interface{}, error) {
