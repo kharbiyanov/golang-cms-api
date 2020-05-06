@@ -22,7 +22,17 @@ func InitSchema(plugin *models.Plugin) {
 
 func setupQuery() {
 	queryFields["fileList"] = &graphql.Field{
-		Type:        graphql.NewList(FileType),
+		Type: graphql.NewObject(graphql.ObjectConfig{
+			Name: "FileList",
+			Fields: graphql.Fields{
+				"data": &graphql.Field{
+					Type: graphql.NewList(FileType),
+				},
+				"count": &graphql.Field{
+					Type: graphql.Int,
+				},
+			},
+		}),
 		Description: "Get file list",
 		Args: graphql.FieldConfigArgument{
 			"lang": &graphql.ArgumentConfig{
