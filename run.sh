@@ -6,4 +6,5 @@ go build -buildmode=plugin -o plugins/terms.so gq/terms/*
 go build -buildmode=plugin -o plugins/menu.so gq/menu/*
 go build -buildmode=plugin -o plugins/auth.so gq/auth/*
 go build -buildmode=plugin -o plugins/files.so gq/files/*
+go build -buildmode=plugin -o plugins/users.so gq/users/*
 go run main.go

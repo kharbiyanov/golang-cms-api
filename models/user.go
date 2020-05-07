@@ -16,7 +16,7 @@ type (
 		FirstName      string     `json:"firstName"`
 		MiddleName     string     `json:"middleName"`
 		Avatar         string     `json:"avatar"`
-		Phone          int64      `json:"phone"`
+		Phone          int        `json:"phone"`
 		Email          string     `json:"email"`
 		ActivationCode string     `gorm:"type:varchar(36)" json:"activation_code"`
 		State          int
