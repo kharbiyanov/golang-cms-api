@@ -133,7 +133,11 @@ func DeleteTerm(params graphql.ResolveParams, taxonomyConfig models.TaxonomyConf
 		}
 	}
 
-	return nil, utils.DB.Delete(term).Error
+	if err := utils.DB.Delete(term).Error; err != nil {
+		return nil, err
+	}
+
+	return nil, utils.DB.Delete(&models.Translation{}, &models.Translation{ElementType: fmt.Sprintf("tax_%s", taxonomyConfig.Taxonomy), ElementID: id}).Error
 }
 
 func GetMetaInTerm(params graphql.ResolveParams) (interface{}, error) {
