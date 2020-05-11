@@ -17,6 +17,11 @@ func GetUser(params graphql.ResolveParams) (interface{}, error) {
 	if err := utils.DB.First(&user).Error; err != nil {
 		return nil, err
 	}
+
+	if err := utils.Roles.LoadPolicy(); err != nil {
+		return user, err
+	}
+
 	return user, nil
 }
 
@@ -85,4 +90,14 @@ func DeleteUser(params graphql.ResolveParams) (interface{}, error) {
 	}
 
 	return user, utils.DB.Delete(user).Error
+}
+
+func GetRoles(params graphql.ResolveParams) (interface{}, error) {
+	user, userExist := params.Source.(models.User)
+
+	if !userExist {
+		return nil, nil
+	}
+
+	return utils.Roles.GetRolesForUser(user.UserName)
 }

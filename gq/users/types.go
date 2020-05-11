@@ -38,6 +38,12 @@ var UserType = graphql.NewObject(
 			"email": &graphql.Field{
 				Type: graphql.String,
 			},
+			"roles": &graphql.Field{
+				Type: graphql.NewList(graphql.String),
+				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+					return GetRoles(params)
+				},
+			},
 		},
 	},
 )
