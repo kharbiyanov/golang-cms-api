@@ -95,4 +95,19 @@ func setupMutation() {
 			return UpdateUser(params)
 		},
 	}
+	mutationFields["userDelete"] = &graphql.Field{
+		Type:        UserType,
+		Description: "Delete user by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "user", "delete"); err != nil {
+				return nil, err
+			}
+			return DeleteUser(params)
+		},
+	}
 }

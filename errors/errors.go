@@ -18,6 +18,7 @@ const (
 	TermParentIDNotFoundMessage   = "Term Parent ID Not Found"
 	LangCodeExistMessage          = "Lang Code Exist"
 	LangNotFoundMessage           = "Lang Not Found"
+	UserNotFoundMessage           = "User Not Found"
 	MenuItemNotFoundMessage       = "Menu Item Not Found"
 	MenuNotFoundMessage           = "Menu Not Found"
 	FileNotFoundMessage           = "File Not Found"

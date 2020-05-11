@@ -2,6 +2,7 @@ package main
 
 import (
 	"cms-api/config"
+	"cms-api/errors"
 	"cms-api/models"
 	"cms-api/utils"
 	"github.com/graphql-go/graphql"
@@ -69,4 +70,19 @@ func UpdateUser(params graphql.ResolveParams) (interface{}, error) {
 		return nil, err
 	}
 	return user, nil
+}
+
+func DeleteUser(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+
+	user := models.User{}
+
+	if utils.DB.First(&user, id).RecordNotFound() {
+		return nil, &errors.ErrorWithCode{
+			Message: errors.UserNotFoundMessage,
+			Code:    errors.InvalidParamsCode,
+		}
+	}
+
+	return user, utils.DB.Delete(user).Error
 }
