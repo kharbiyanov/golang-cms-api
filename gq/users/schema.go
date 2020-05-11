@@ -14,8 +14,10 @@ var (
 
 func InitSchema(plugin *models.Plugin) {
 	setupQuery()
+	setupMutation()
 
 	plugin.QueryFields = queryFields
+	plugin.MutationFields = mutationFields
 }
 
 func setupQuery() {
@@ -61,6 +63,36 @@ func setupQuery() {
 				return nil, err
 			}
 			return GetUserList(params)
+		},
+	}
+}
+
+func setupMutation() {
+	mutationFields["userUpdate"] = &graphql.Field{
+		Type:        UserType,
+		Description: "Update user by id.",
+		Args: graphql.FieldConfigArgument{
+			"id": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.Int),
+			},
+			"last_name": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"first_name": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"middle_name": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+			"phone": &graphql.ArgumentConfig{
+				Type: graphql.String,
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "user", "update"); err != nil {
+				return nil, err
+			}
+			return UpdateUser(params)
 		},
 	}
 }
