@@ -19,6 +19,7 @@ type (
 		Phone          int        `json:"phone"`
 		Email          string     `json:"email"`
 		ActivationCode string     `gorm:"type:varchar(36)" json:"activation_code"`
+		Roles          []string   `gorm:"-"`
 		State          int
 	}
 )
