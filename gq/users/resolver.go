@@ -43,3 +43,30 @@ func GetUserList(params graphql.ResolveParams) (interface{}, error) {
 	}
 	return result, nil
 }
+
+func UpdateUser(params graphql.ResolveParams) (interface{}, error) {
+	id, _ := params.Args["id"].(int)
+	fields := make(map[string]interface{})
+
+	var user models.User
+
+	if val, ok := params.Args["last_name"].(string); ok {
+		fields["last_name"] = val
+	}
+	if val, ok := params.Args["first_name"].(string); ok {
+		fields["first_name"] = val
+	}
+	if val, ok := params.Args["middle_name"].(string); ok {
+		fields["middle_name"] = val
+	}
+	if val, ok := params.Args["phone"].(int); ok {
+		fields["phone"] = val
+	}
+
+	user.ID = id
+
+	if err := utils.DB.Model(&user).Updates(fields).Scan(&user).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}

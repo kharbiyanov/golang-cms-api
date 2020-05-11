@@ -10,11 +10,11 @@ type (
 		CreatedAt      time.Time  `json:"created_at"`
 		UpdatedAt      time.Time  `json:"updated_at"`
 		DeletedAt      *time.Time `sql:"index" json:"deleted_at"`
-		UserName       string     `json:"userName"`
+		UserName       string     `json:"user_name"`
 		Password       string     `json:"-"`
-		LastName       string     `json:"lastName"`
-		FirstName      string     `json:"firstName"`
-		MiddleName     string     `json:"middleName"`
+		LastName       string     `json:"last_name"`
+		FirstName      string     `json:"first_name"`
+		MiddleName     string     `json:"middle_name"`
 		Avatar         string     `json:"avatar"`
 		Phone          int        `json:"phone"`
 		Email          string     `json:"email"`
