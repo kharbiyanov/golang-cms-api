@@ -76,23 +76,6 @@ func CheckToken(token string) (models.User, error) {
 	return user, nil
 }
 
-func CheckPermission(userName string, object string, action string) error {
-	if err := Roles.LoadPolicy(); err != nil {
-		return err
-	}
-
-	ok := Roles.Enforce(userName, object, action)
-
-	if !ok {
-		return &errors.ErrorWithCode{
-			Message: errors.ForbiddenCodeMessage,
-			Code:    errors.ForbiddenCode,
-		}
-	}
-
-	return nil
-}
-
 func ValidateUser(p graphql.ResolveParams, object string, action string) error {
 	user := GetAuthUser(p)
 	if user != nil {

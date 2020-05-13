@@ -7,4 +7,5 @@ go build -buildmode=plugin -o plugins/menu.so gq/menu/*
 go build -buildmode=plugin -o plugins/auth.so gq/auth/*
 go build -buildmode=plugin -o plugins/files.so gq/files/*
 go build -buildmode=plugin -o plugins/users.so gq/users/*
+go build -buildmode=plugin -o plugins/roles.so gq/roles/*
 CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o main .
