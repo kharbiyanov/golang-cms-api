@@ -19,7 +19,7 @@ var TokenType = graphql.NewObject(
 )
 var UserType = graphql.NewObject(
 	graphql.ObjectConfig{
-		Name: "User",
+		Name: "AuthUser",
 		Fields: graphql.Fields{
 			"id": &graphql.Field{
 				Type: graphql.NewNonNull(graphql.Int),

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"cms-api/config"
+	"cms-api/errors"
 	"fmt"
 	"github.com/casbin/casbin"
 	"github.com/casbin/gorm-adapter"
@@ -22,4 +23,21 @@ func init() {
 		c.DB.SSL,
 	), true)
 	Roles = casbin.NewEnforcer("rbac_model.conf", casbinGormAdapter)
+}
+
+func CheckPermission(userName string, object string, action string) error {
+	if err := Roles.LoadPolicy(); err != nil {
+		return err
+	}
+
+	ok := Roles.Enforce(userName, object, action)
+
+	if !ok {
+		return &errors.ErrorWithCode{
+			Message: errors.ForbiddenCodeMessage,
+			Code:    errors.ForbiddenCode,
+		}
+	}
+
+	return nil
 }
