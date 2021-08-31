@@ -33,5 +33,25 @@ func setupQuery() {
 }
 
 func setupMutation() {
-
+	queryFields["roleAddAccess"] = &graphql.Field{
+		Type:        RoleType,
+		Description: "Add role access.",
+		Args: graphql.FieldConfigArgument{
+			"role": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"object": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"action": &graphql.ArgumentConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		Resolve: func(params graphql.ResolveParams) (interface{}, error) {
+			if err := utils.ValidateUser(params, "role", "list"); err != nil {
+				return nil, err
+			}
+			return AddRoleAccess(params)
+		},
+	}
 }
